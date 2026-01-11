@@ -69,7 +69,7 @@ class WebDashPageController extends Controller
 
     public function serverItem(Request $request, $id)
     {
-        $server = Server::find($id);
+        $server = Server::with('senders')->find($id);
 
         return Inertia::render('dashboards/servers/add', compact('server'));
     }

@@ -35,7 +35,7 @@ class SenderApiController extends Controller
                     'message' => 'สำเร็จ',
                     'data' => $sender,
                     'code' => 201,
-                ]);
+                ], 201);
             }else{
                 return  response()->json([
                     'message' => 'ไม่สำเร็จ',

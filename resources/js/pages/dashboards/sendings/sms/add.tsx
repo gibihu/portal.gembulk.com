@@ -14,12 +14,13 @@ import AppLayout from "@/layouts/app-layout";
 import { normalizePhones } from "@/lib/phone-filter";
 import { useDetectSpamWord } from "@/lib/spam-word";
 import { toTimestamp } from "@/lib/timestamp";
+import { GetServerByUser } from "@/models/servers/get";
 import api from "@/routes/api";
 import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { PlanType, SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import { addYears } from "date-fns";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,10 +35,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 export default function SmsAddPage(request: any) {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
-    const [user, setUser] = useState<UserType>(request.auth.user ?? {} as UserType);
-    const [plan, setPlan] = useState<PlanType>(request.auth.user.plan ?? {} as PlanType);
-    const [servers, setServers] = useState<ServerType[]>(request.auth.user.plan.servers ?? {} as ServerType[]);
+
+    const csrfToken = request.csrf;
+    const [servers, setServers] = useState<ServerType[]>([]);
     const [isFetch, setIsFetch] = useState<boolean>(false);
     const [countReceivers, setCountReceivers] = useState<number>(0);
     const [phoneAfterFilter, setPhoneAfterFilter] = useState<string[]>([]);
@@ -45,8 +45,15 @@ export default function SmsAddPage(request: any) {
     const [detectdBadWord, setDetecBadWord] = useState<string[]>([]);
 
     useEffect(() => {
-        console.log(request);
+        const fetchServers = async () => {
+            const serversData = await GetServerByUser(['with=senders'], setIsFetch);
+
+            setServers(serversData);
+        };
+
+        fetchServers();
     }, []);
+    
     const now = new Date();
     now.setMinutes(now.getMinutes() + 5); // บวก 5 นาที
 
@@ -172,7 +179,7 @@ export default function SmsAddPage(request: any) {
                                                 <SelectContent>
                                                     {servers.map((server: ServerType, index: number) => (
                                                         <SelectGroup key={index}>
-                                                            {server.senders.map((sender: SenderType, key: number) => (
+                                                            {server.senders?.map((sender: SenderType, key: number) => (
                                                                 sender.status_text == 'active' && (
                                                                     <SelectItem key={key} value={sender.id.toString()}>
                                                                         {sender.name}

@@ -33,9 +33,7 @@ class Server extends Model
         'callbacks' => 'json',
     ];
 
-    protected $with = [
-        'senders',
-    ];
+    protected $with = [];
 
     protected $hidden = [
         'server_id',

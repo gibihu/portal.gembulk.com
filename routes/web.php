@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Pages\Auth\LoginController;
+use App\Http\Controllers\Pages\Dashs\WebDashAdminPage;
 use App\Http\Controllers\Pages\Dashs\WebDashPageController;
 use App\Http\Controllers\Pages\WebPageController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,12 @@ Route::name('web.')->group(function () {
             Route::prefix('reports')->name('report.')->group(function () {
                 Route::get('sms', 'reportSMS')->name('sms');
                 Route::get('otp', 'reportOTP')->name('otp');
+            });
+
+            Route::controller(WebDashAdminPage::class)->prefix('admin')->name('admin.')->group(function () {
+                Route::prefix('senders')->name('senders.')->group(function () {
+                    Route::get('requests', 'senderRequests')->name('requests');
+                });
             });
         });
     });

@@ -48,9 +48,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = [
-        'plan'
-    ];
+    protected $with = [];
 
     public function plan()
     {

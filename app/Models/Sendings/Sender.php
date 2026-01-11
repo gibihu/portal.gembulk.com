@@ -30,4 +30,8 @@ class Sender extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    public function server()
+    {
+        return $this->belongsTo(Server::class, 'server_id', 'id');
+    }
 }

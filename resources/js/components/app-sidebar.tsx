@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/sidebar';
 import { NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket } from 'lucide-react';
+import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavProjects } from './nav-project';
 import web from '@/routes/web';
 import { UserType } from '@/types/user';
+import { check } from 'node_modules/zod/v4/classic/external.cjs';
 
 const mainNavItems: NavItem[] = [
     {
@@ -141,13 +142,13 @@ export function AppSidebar() {
         ...(isAdmin
             ? [
                 {
-                    title: "พื้นที่ทำงาน",
+                    title: "Administration",
                     items: [
                         {
-                            title: "ผู้ใช้",
-                            href: "#",
+                            title: "อนุมัติผู้ส่ง",
+                            href: web.dash.admin.senders.requests().url,
                             isActive: true,
-                            icon: Layers
+                            icon: TicketCheck
                         },
                         {
                             title: "ทีเด็ดทั้งหมด",
@@ -190,11 +191,11 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 {/* <NavProjects projects={data.projects} /> */}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -49,7 +49,7 @@ export interface ServerType {
     headers: ServerHeaderType;
     body: ServerBodyType;
     callbacks: ServerCallBackType;
-    senders: SenderType[];
+    senders?: SenderType[] | [];
     updated_at: string;
     created_at: string;
 }
@@ -77,6 +77,8 @@ export interface SenderType {
     name: string;
     status: number;
     status_text: string;
+    server?: ServerType | null;
+    user?: UserType | null;
     updated_at: string;
     created_at: string;
 }

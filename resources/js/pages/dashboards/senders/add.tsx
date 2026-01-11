@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AppLayout from "@/layouts/app-layout";
 import { extractDomain } from "@/lib/url-functions";
+import { GetServerByUser } from "@/models/servers/get";
 import api from "@/routes/api";
 import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
@@ -22,7 +23,7 @@ import z from "zod";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Add Server',
+        title: 'Add Sender',
         href: web.dash.server.add().url,
     },
 ];
@@ -35,7 +36,7 @@ export default function AddSenderPage(request: any) {
     const [requestId, setRequestId] = useState<string>((request.sender.id ?? "").toString());
     const [isFetch, setIsFetch] = useState<boolean>(false);
     const [user, setUser] = useState<UserType>(request.auth ? (request.auth.user ?? {}) : {});
-    const [servers, setServers] = useState<ServerType[]>(user?.plan?.servers ?? []);
+    const [servers, setServers] = useState<ServerType[]>([]);
     const [selectedServer, setSelectedServer] = useState<ServerType | null>(servers?.length > 0 ? servers[0] : null);
 
     const server_info_schema = z.object({
@@ -53,6 +54,17 @@ export default function AddSenderPage(request: any) {
         defaultValues,
         mode: "onChange",
     });
+
+    useEffect(() => {
+        const fetchServers = async () => {
+            const serversData = await GetServerByUser(['with=senders'], setIsFetch);
+
+            setServers(serversData);
+            setSelectedServer(serversData.length > 0 ? serversData[0] : null);
+        };
+
+        fetchServers();
+    }, []);
 
     function submit(field: FormValues) {
         const fetchData = async () => {
@@ -78,7 +90,7 @@ export default function AddSenderPage(request: any) {
                             server.id === selectedServer?.id
                                 ? {
                                     ...server,
-                                    senders: [...server.senders, res.data],
+                                    senders: [...(server.senders || []), res.data],
                                 }
                                 : server
                         )
