@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
-import login from '@/routes/login';
 import { request } from '@/routes/password';
+import web from '@/routes/web';
 import { Form, Head, usePage } from '@inertiajs/react';
 
 interface LoginProps {
@@ -32,7 +32,7 @@ export default function Login({
             <Head title="Log in" />
 
             <Form
-                {...login.store.form()}
+                {...web.login.store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >

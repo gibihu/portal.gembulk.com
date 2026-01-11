@@ -1,5 +1,4 @@
 import AppLayout from "@/layouts/app-layout";
-import dash from "@/routes/dash";
 import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
 import { useEffect } from "react";
@@ -8,11 +7,12 @@ import * as React from "react";
 
 import { ReportType } from "@/types/user";
 import SendingTable from "../table";
+import web from "@/routes/web";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'กำหนดการส่ง',
-        href: dash.jobs.sms().url,
+        href: web.dash.jobs.sms().url,
     },
 ];
 

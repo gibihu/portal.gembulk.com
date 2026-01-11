@@ -34,11 +34,11 @@ class SendingTableSeeder extends Seeder
             'url' => 'https://api.me-sms.com/v1/sms',
             'method' => 'POST',
             'settings' => [
-                'cradits' => [
+                'credits' => [
                     'amount' => 0,
                     'sync_method' => 'GET',
                     'sync_url' => '{base_url}/v1/users/balance',
-                    'callback' => ['bananc', '{cradit}']
+                    'callback' => ['bananc', '{credit}']
                 ]
             ],
             'headers' => Crypt::encryptString(json_encode(
@@ -63,22 +63,27 @@ class SendingTableSeeder extends Seeder
             [
                 'name' => 'GTSF',
                 'server_id' =>  $server->id,
+                'status' => 10,
             ],
             [
                 'name' => 'KDCR-C',
                 'server_id' =>  $server->id,
+                'status' => 10,
             ],
             [
                 'name' => 'LBTF',
                 'server_id' =>  $server->id,
+                'status' => 10,
             ],
             [
                 'name' => 'SLL',
                 'server_id' =>  $server->id,
+                'status' => 10,
             ],
             [
                 'name' => 'EventP',
                 'server_id' =>  $server->id,
+                'status' => 10,
             ],
         ];
 

@@ -1,19 +1,18 @@
 import AppLayout from "@/layouts/app-layout";
-import dash from "@/routes/dash";
 import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
 import ServerTable from "./table";
+import web from "@/routes/web";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Servers',
-        href: dash.server.lists().url,
+        href: web.dash.server.lists().url,
     },
 ];
 
 
 export default function ServerListPage(request: any) {
-    console.log(request);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

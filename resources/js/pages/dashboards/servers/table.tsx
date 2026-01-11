@@ -1,4 +1,4 @@
-import dash from "@/routes/dash";
+
 import { BreadcrumbItem } from "@/types";
 import {
     ColumnDef,
@@ -13,7 +13,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, SquarePen } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, SquarePen } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,12 @@ import {
 } from "@/components/ui/table";
 import { ServerType } from "@/types/user";
 import { Link } from "@inertiajs/react";
+import web from "@/routes/web";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: dash.jobs.sms().url,
+        href: web.dash.jobs.sms().url,
     },
 ];
 
@@ -84,9 +85,9 @@ export const columns: ColumnDef<ServerType>[] = [
         accessorKey: "credit",
         header: "Credit",
         cell: ({ row }) => {
-            const amount = row.original.settings.credits.amount;
+            const amount = row.original.settings?.credits?.amount ?? 0;
 
-            return amount
+            return amount;
         },
     },
     {
@@ -106,7 +107,7 @@ export const columns: ColumnDef<ServerType>[] = [
 
             return (
                 <div className="flex gap-2">
-                    <Link href={dash.server.item({id: row.original.id})} prefetch >
+                    <Link href={web.dash.server.item({ id: row.original.id })} prefetch >
                         <Button>
                             <SquarePen />
                         </Button>
@@ -149,10 +150,15 @@ export default function ServerTable({ items }: { items: any }) {
 
     return (
         <div className="w-full">
-            <div className="flex items-center py-4">
+            <div className="flex items-center justify-end gap-2 py-4">
+                <Link href={web.dash.server.add().url}>
+                    <Button>
+                        <Plus />
+                    </Button>
+                </Link>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                        <Button variant="outline" className="">
                             Columns <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>

@@ -34,10 +34,9 @@ class Plan extends Model
     ];
 
 //    แปลงเป็นข้อความ
-    public function getServersAttribute($value)
+    public function serversRelation()
     {
-        $ids = json_decode($value, true) ?? [];
-        return Server::whereIn('id', $ids)->get();
+        return $this->hasMany(Server::class, 'id', 'servers');
     }
 //    แปลงกลับตอนบันทึก
     public function setServersAttribute($value)
