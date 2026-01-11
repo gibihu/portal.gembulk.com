@@ -15,7 +15,7 @@ import { normalizePhones } from "@/lib/phone-filter";
 import { useDetectSpamWord } from "@/lib/spam-word";
 import { toTimestamp } from "@/lib/timestamp";
 import api from "@/routes/api";
-import dash from "@/routes/dash";
+import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { PlanType, SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +30,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่ง sms',
-        href: dash.create.sms().url,
+        href: web.dash.create.sms().url,
     },
 ];
 export default function SmsAddPage(request: any) {
@@ -107,7 +107,7 @@ export default function SmsAddPage(request: any) {
                     toast.success(result.message);
                     router.reload();
                     form.reset();
-                    router.visit(dash.jobs.sms().url);
+                    router.visit(web.dash.jobs.sms().url);
                 } else {
                     toast.error(result.message, { description: result.description ?? '' });
                 }
@@ -173,7 +173,11 @@ export default function SmsAddPage(request: any) {
                                                     {servers.map((server: ServerType, index: number) => (
                                                         <SelectGroup key={index}>
                                                             {server.senders.map((sender: SenderType, key: number) => (
-                                                                <SelectItem key={key} value={sender.id}>{sender.name}</SelectItem>
+                                                                sender.status_text == 'active' && (
+                                                                    <SelectItem key={key} value={sender.id.toString()}>
+                                                                        {sender.name}
+                                                                    </SelectItem>
+                                                                )
                                                             ))}
                                                         </SelectGroup>
                                                     ))}

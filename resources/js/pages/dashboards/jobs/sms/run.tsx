@@ -3,7 +3,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/co
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
 import api from "@/routes/api";
-import dash from "@/routes/dash";
+import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { ReportType } from "@/types/user";
 import { Head, router } from "@inertiajs/react";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: dash.jobs.sms().url,
+        href: web.dash.jobs.sms().url,
     },
 ];
 

@@ -13,7 +13,7 @@ export interface BreadcrumbItem {
 
 export interface NavGroup {
     title: string;
-    items: NavItem[];
+    items: NavItemWithSubItems[];
 }
 
 export interface NavItem {
@@ -21,6 +21,17 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+}
+
+export interface NavItemWithSubItems extends NavItem {
+    title: string;
+    href: NonNullable<InertiaLinkProps['href']>;
+    icon?: LucideIcon | null;
+    isActive?: boolean;
+    items?: {
+        title: string
+        href: string
+    }[]
 }
 
 export interface SharedData {

@@ -13,6 +13,8 @@ return new class extends Migration {
 
         Schema::create('sd_servers', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->string('name');
             $table->string('static_name');
             $table->string('host')->nullable();

@@ -1,5 +1,4 @@
 import AppLayout from "@/layouts/app-layout";
-import dash from "@/routes/dash";
 import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
 import { useEffect } from "react";
@@ -8,11 +7,12 @@ import * as React from "react";
 
 import { ReportType } from "@/types/user";
 import ReportTable from "../table";
+import web from "@/routes/web";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่งแล้ว',
-        href: dash.report.sms().url,
+        href: web.dash.report.sms().url,
     },
 ];
 

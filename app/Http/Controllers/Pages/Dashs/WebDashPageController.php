@@ -11,6 +11,7 @@ use App\Models\Sendings\SpamWord;
 use App\Models\Sendings\Server;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class WebDashPageController extends Controller
@@ -50,8 +51,14 @@ class WebDashPageController extends Controller
 
     public function serverAdd(Request $request)
     {
-        return Inertia::render('dashboards/servers/add');
+        $server_id = Str::uuid()->toString();
+        $server = [
+            'id' => $server_id,
+        ];
+
+        return Inertia::render('dashboards/servers/add', compact('server'));
     }
+
     public function serverLists(Request $request)
     {
         $user = $request->user();
@@ -59,10 +66,21 @@ class WebDashPageController extends Controller
 
         return Inertia::render('dashboards/servers/lists', compact('servers'));
     }
+
     public function serverItem(Request $request, $id)
     {
         $server = Server::find($id);
 
         return Inertia::render('dashboards/servers/add', compact('server'));
+    }
+
+    public function senderAdd(Request $request)
+    {
+        $sender_id = Str::uuid()->toString();
+        $sender = [
+            'id' => $sender_id,
+        ];
+
+        return Inertia::render('dashboards/senders/add', compact('sender'));
     }
 }

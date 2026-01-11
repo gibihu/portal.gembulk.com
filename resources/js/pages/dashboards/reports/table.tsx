@@ -1,4 +1,3 @@
-import dash from "@/routes/dash";
 import { BreadcrumbItem } from "@/types";
 import {
     ColumnDef,
@@ -38,11 +37,12 @@ import {
 import { ReportType } from "@/types/user";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import web from "@/routes/web";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: dash.jobs.sms().url,
+        href: web.dash.jobs.sms().url,
     },
 ];
 

@@ -73,8 +73,10 @@ export interface ServerCallBackType {
 }
 export interface SenderType {
     id: string;
+    user_id: string | null;
     name: string;
-    status: string;
+    status: number;
+    status_text: string;
     updated_at: string;
     created_at: string;
 }

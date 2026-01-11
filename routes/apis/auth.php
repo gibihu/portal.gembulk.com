@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Apis\Dashs\Sending\SMSApiController;
+use App\Http\Controllers\Apis\Senders\SenderApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
@@ -13,6 +14,9 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
                 Route::get('/sms', 'syncJob')->name('sms');
             });
         });
+    });
 
+    Route::controller(SenderApiController::class)->prefix('senders')->name('senders.')->group(function () {
+        Route::post('/request', 'senderRequest')->name('request');
     });
 });
