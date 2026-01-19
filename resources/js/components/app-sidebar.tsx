@@ -50,18 +50,6 @@ export function AppSidebar() {
             title: "Platform",
             items: [
                 {
-                    title: "Server",
-                    href: web.dash.server.lists().url,
-                    icon: Server,
-                    isActive: false,
-                    items: [
-                        {
-                            title: "List",
-                            href: web.dash.server.lists().url,
-                        },
-                    ],
-                },
-                {
                     title: "Sender",
                     href: web.dash.senders.add().url,
                     icon: Ticket,
@@ -74,37 +62,28 @@ export function AppSidebar() {
                     ],
                 },
                 {
-                    title: "Creating",
-                    href: web.dash.create.sms().url,
+                    title: "SMS",
+                    href: web.dash.sending.sms.add().url,
                     icon: Notebook,
                     isActive: false,
-                    items: [
-                        {
-                            title: "SMS",
-                            href: web.dash.create.sms().url,
-                        },
-                        {
-                            title: "OTP",
-                            href: web.dash.create.otp().url,
-                        },
-                    ],
+                    items: [],
                 },
-                {
-                    title: "Sending",
-                    href: web.dash.sending.sms().url,
-                    icon: Send,
-                    isActive: false,
-                    items: [
-                        {
-                            title: "SMS",
-                            href: web.dash.sending.sms().url,
-                        },
-                        {
-                            title: "OTP",
-                            href: web.dash.sending.otp().url,
-                        },
-                    ],
-                },
+                // {
+                //     title: "Sending",
+                //     href: web.dash.sending.sms().url,
+                //     icon: Send,
+                //     isActive: false,
+                //     items: [
+                //         {
+                //             title: "SMS",
+                //             href: web.dash.sending.sms().url,
+                //         },
+                //         {
+                //             title: "OTP",
+                //             href: web.dash.sending.otp().url,
+                //         },
+                //     ],
+                // },
                 {
                     title: "Jobs",
                     href: web.dash.jobs.sms().url,
@@ -144,6 +123,18 @@ export function AppSidebar() {
                 {
                     title: "Administration",
                     items: [
+                        {
+                            title: "Server",
+                            href: web.dash.admin.server.lists().url,
+                            icon: Server,
+                            isActive: false,
+                            items: [
+                                {
+                                    title: "List",
+                                    href: web.dash.admin.server.lists().url,
+                                },
+                            ],
+                        },
                         {
                             title: "อนุมัติผู้ส่ง",
                             href: web.dash.admin.senders.requests().url,

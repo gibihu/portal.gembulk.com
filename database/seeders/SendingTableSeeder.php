@@ -2,17 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Models\Sendings\Campaign;
 use App\Models\Sendings\Plan;
+use App\Models\Sendings\CampaignReceiver;
 use App\Models\Sendings\Sender;
-use App\Models\Sendings\Server;
+use App\Models\Sendings\Servers\Server;
+use App\Models\Sendings\Servers\ServerAction;
 use App\Models\Sendings\SpamWord;
 use App\Models\Users\Role;
 use App\Models\Users\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Crypt;
 
 class SendingTableSeeder extends Seeder
 {
@@ -28,36 +27,203 @@ class SendingTableSeeder extends Seeder
 
 
         $server = Server::create([
-            'name' => 'Me SMS',
-            'static_name' => 'me-sms',
-            'host' => 'api.me-sms.com',
-            'url' => 'https://api.me-sms.com/v1/sms',
-            'method' => 'POST',
-            'settings' => [
-                'credits' => [
-                    'amount' => 0,
-                    'sync_method' => 'GET',
-                    'sync_url' => '{base_url}/v1/users/balance',
-                    'callback' => ['bananc', '{credit}']
-                ]
-            ],
-            'headers' => Crypt::encryptString(json_encode(
-                [
-                    'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTU0LCJlbWFpbCI6ImdlbWZhdGVmdWd1aUBnbWFpbC5jb20iLCJuYW1lIjoiZ2VtYnVsayIsInBob25lIjoiMDk1NjM0Njc1NiIsInN0YXR1cyI6ImFjdGl2ZSIsImNyZWF0ZWRBdCI6IjIwMjUtMDktMDVUMTc6NTg6NTIuNjAwWiIsInVwZGF0ZWRBdCI6IjIwMjUtMDktMDVUMTc6NTg6NTIuNjAwWiIsImxvbmdMaXZlVG9rZW4iOnRydWUsImlhdCI6MTc1ODQ2NTUxOSwiZXhwIjoxNzkwMDIzMTE5fQ.sJQDjwKOYALP_cB_szSnW4g7cY3CmsbOfiGRaeSXZvU',
-                    'Accept' => 'application/json',
-                ]
-            )),
-            'body' => [
-                ['sender', '{sender}'],
-                ['content', '{msg}'],
-                ['msisdn', '{receiver}'],
-            ],
-            'callbacks' => [
-                ['success', '{success}'], // key value success
-                ['message', '{msg}'],
-                ['data', '{data}']
-            ],
+            'name' => 'Siam SMS',
+            'host' => 'https://member.ac-siam-sms.com',
         ]);
+
+        $server_actions_data = [
+            [
+                "server_id" => $server->id,
+                "action_key" => "sms",
+                "method" => "POST",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/send",
+                "headers" => [
+                    [
+                        "Content-Type" => "application/json"
+                    ],
+                    [
+                        "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu"
+                    ]
+                ],
+                "body" => [
+                    [
+                        "message" => "message",
+                        "isArray" => false
+                    ],
+                    [
+                        "sender" => "sender_name",
+                        "isArray" => false
+                    ],
+                    [
+                        "receivers" => "phone_numbers",
+                        "isArray" => false
+                    ],
+                    [
+                        "scheduled_at" => "send_at",
+                        "isArray" => false
+                    ]
+                ],
+                "response" => [
+                    [
+                        "status" => "success"
+                    ],
+                    [
+                        "message" => "message"
+                    ],
+                    [
+                        "ref_id" => "campaign_id"
+                    ]
+                ],
+                "settings" => null,
+                "status" => 0,
+            ],
+            [
+                "server_id" => $server->id,
+                "action_key" => "sms_report",
+                "method" => "GET",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/report",
+                "headers" => [
+                    [
+                        "Content-Type" => "application/json"
+                    ],
+                    [
+                        "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu"
+                    ]
+                ],
+                "body" => [
+                    [
+                        "ref_id" => "campaign_id",
+                        "isArray" => false
+                    ],
+                    [
+                        "campaign_name" => "campaign_name",
+                        "isArray" => false
+                    ],
+                    [
+                        "sender_name" => "sender_name",
+                        "isArray" => false
+                    ],
+                    [
+                        "limit" => "50",
+                        "isArray" => false
+                    ]
+                ],
+            "response" => [
+                [
+                    "status" => "success"
+                ],
+                [
+                    "message" => "message"
+                ],
+                [
+                    "ref_id" => "campaign_id"
+                ]
+            ],
+                "settings" => null,
+                "status" => 0,
+            ],
+            [
+                "server_id" => $server->id,
+                "action_key" => "otp",
+                "method" => "POST",
+                "endpoint" => "",
+                "headers" => [
+                    [
+                        "Content-Type" => "application/json"
+                    ]
+                ],
+                "body" => [
+                    [
+                        "message" => "message",
+                        "isArray" => false
+                    ],
+                    [
+                        "sender" => null,
+                        "isArray" => false
+                    ],
+                    [
+                        "receiver" => null,
+                        "isArray" => false
+                    ],
+                    [
+                        "scheduled_at" => "send_at",
+                        "isArray" => false
+                    ]
+                ],
+                "response" => [
+                    [
+                        "status" => "success"
+                    ],
+                    [
+                        "message" => "message"
+                    ],
+                    [
+                        "ref_id" => "campaign_id"
+                    ]
+                ],
+                "settings" => null,
+                "status" => 0,
+            ],
+            [
+                "server_id" => $server->id,
+                "action_key" => "otp_report",
+                "method" => "POST",
+                "endpoint" => "",
+                "headers" => [
+                    [
+                        "Content-Type" => "application/json"
+                    ]
+                ],
+                "body" => [
+                    [
+                        "message" => "message",
+                        "isArray" => false
+                    ],
+                    [
+                        "sender" => null,
+                        "isArray" => false
+                    ],
+                    [
+                        "receiver" => null,
+                        "isArray" => false
+                    ],
+                    [
+                        "scheduled_at" => "false",
+                        "isArray" => false
+                    ]
+                ],
+                "response" => [
+                    [
+                        "status" => "success"
+                    ],
+                    [
+                        "message" => "message"
+                    ],
+                    [
+                        "ref_id" => "campaign_id"
+                    ]
+                ],
+                "settings" => null,
+                "status" => 0,
+            ]
+        ];
+
+        foreach ($server_actions_data as $action) {
+            $server->actions()->updateOrCreate(
+                [
+                    'server_id' => $server->id,
+                    'action_key' => $action['action_key'],
+                ],
+                [
+                    'method' => $action['method'] ?? 'POST',
+                    'endpoint' => $action['endpoint'] ?? '',
+                    'headers' => $action['headers'] ?? [],
+                    'body' => $action['body'] ?? [],
+                    'response' => $action['response'] ?? [],
+                    'status' => ServerAction::STATUS_DRAFT,
+                ]
+            );
+        }
 
         $senders = [
             [
@@ -81,14 +247,14 @@ class SendingTableSeeder extends Seeder
                 'status' => 10,
             ],
             [
-                'name' => 'EventP',
+                'name' => 'SeaDentinY',
                 'server_id' =>  $server->id,
                 'status' => 10,
             ],
         ];
 
         foreach ($senders as $item) {
-            Sender::create($item);
+            $sender = Sender::create($item);
         }
 
         $plan = Plan::create([
@@ -113,6 +279,57 @@ class SendingTableSeeder extends Seeder
 
         $server->user_id = $user->id;
         $server->save();
+
+        Campaign::create([
+            'name' => 'Test Campaign 1',
+            'action_key' => 'sms',
+            'receivers' => ['66924187401'],
+            'message' => 'Test',
+            'data' => [
+                'cost' => 1,
+                'real_cost' => 1,
+                'phone_counts' => 1,
+            ],
+            'total_cost' => 1,
+            'status' => Campaign::STATUS_PENDING,
+            'sender_name' => $sender->name,
+            'sender_id' => $sender->id,
+            'server_name' => $server->name,
+            'server_id' => $server->id,
+            'user_id' => $user->id,
+            'scheduled_at' => null,
+        ]);
+        $campaign = Campaign::create([
+            'name' => 'Test Campaign 2',
+            'action_key' => 'sms',
+            'receivers' => ['66924187401'],
+            'message' => 'Test Message',
+            'data' => [
+                'cost' => 2,
+                'real_cost' => 2,
+                'phone_counts' => 1,
+            ],
+            'total_cost' => 2,
+            'status' => Campaign::STATUS_PENDING,
+            'sender_name' => $sender->name,
+            'sender_id' => $sender->id,
+            'server_name' => $server->name,
+            'server_id' => $server->id,
+            'user_id' => $user->id,
+            'scheduled_at' => null,
+        ]);
+
+        foreach ($campaign->receivers as $receiver) {
+            $sending = CampaignReceiver::create([
+                'receiver' => $receiver,
+                'message' => $campaign->message,
+                'sender_name' => $sender->name,
+                'cost' => 2,
+                'action_key' => 'sms',
+                'campaign_id' => $campaign->id,
+                'status' => CampaignReceiver::STATUS_PENDING,
+            ]);
+        }
 
 
         $words = [

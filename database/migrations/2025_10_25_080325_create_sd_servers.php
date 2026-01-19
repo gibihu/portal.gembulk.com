@@ -13,21 +13,49 @@ return new class extends Migration {
 
         Schema::create('sd_servers', function (Blueprint $table) {
             $table->uuid('id')->primary();
+
             $table->uuid('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->string('name');
-            $table->string('static_name');
-            $table->string('host')->nullable();
-            $table->string('url');
-            $table->string('method')->default('GET');
-            $table->json('settings')->nullable();
-            $table->longText('headers')->nullable();
-            $table->json('body')->nullable();
-            $table->json('callbacks')->nullable();
-            $table->bigInteger('credits')->default(0);
 
+            $table->string('name');
+
+            $table->string('host');
+
+            $table->tinyInteger('status')->default(0);
+
+            $table->softDeletes();
             $table->timestamps();
         });
+
+        Schema::create('sd_server_actions', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+
+            $table->uuid('server_id');
+            $table->foreign('server_id')
+                ->references('id')
+                ->on('sd_servers')
+                ->onDelete('cascade');
+
+            // เช่น sms, sms_otp, email_otp, verify_otp
+            $table->string('action_key');
+
+            // HTTP
+            $table->string('method')->default('POST');
+            $table->string('endpoint'); // /send , /otp/send
+
+            // dynamic config
+            $table->json('headers')->nullable();
+            $table->json('body')->nullable();
+            $table->json('response')->nullable();
+            $table->json('settings')->nullable();
+
+            $table->tinyInteger('status')->default(0);
+
+            $table->timestamps();
+
+            $table->unique(['server_id', 'action_key']);
+        });
+
 
     }
 
@@ -37,5 +65,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('sd_servers');
+        Schema::dropIfExists('sd_server_actions');
     }
 };

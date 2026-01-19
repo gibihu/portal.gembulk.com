@@ -2,6 +2,7 @@
 
 namespace App\Models\Sendings;
 
+use App\Models\Sendings\Servers\Server;
 use App\Models\Users\User;
 use App\Traits\GlobalStatusTrait;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;

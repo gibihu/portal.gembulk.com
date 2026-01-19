@@ -198,7 +198,7 @@ export default function SendingTable({ items }: { items: any }) {
                 </DropdownMenu>
             </div>
             <div className="overflow-hidden rounded-md border">
-                <Table>
+                <Table className="bg-background">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -263,7 +263,7 @@ export default function SendingTable({ items }: { items: any }) {
                                 table.setPageSize(Number(value))
                             }}
                         >
-                            <SelectTrigger className="w-20" id="rows-per-page">
+                            <SelectTrigger className="w-20 h-9" id="rows-per-page">
                                 <SelectValue
                                     placeholder={table.getState().pagination.pageSize}
                                 />

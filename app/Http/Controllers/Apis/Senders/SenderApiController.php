@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Sendings\Sender;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class SenderApiController extends Controller
 {
     public function senderRequest(Request $request)
     {
-        try{
+        try {
             $request->validate([
                 'name' => 'required',
                 'request_id' => 'required',
@@ -30,25 +32,86 @@ class SenderApiController extends Controller
             $sender->user_id = $is_free ? null : $user_id;
             $sender->server_id = $server_id;
             $sender->status = Sender::STATUS_PENDING;
-            if($sender->save()){
+            if ($sender->save()) {
                 return response()->json([
                     'message' => 'สำเร็จ',
                     'data' => $sender,
                     'code' => 201,
                 ], 201);
-            }else{
-                return  response()->json([
+            } else {
+                return response()->json([
                     'message' => 'ไม่สำเร็จ',
                     'code' => 400
                 ], 400);
             }
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response = [
                 'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
                 'description' => $e->getMessage() ?? '',
                 'code' => 500,
             ];
-            if(config('app.debug')) $response['debug'] = [
+            if (config('app.debug')) $response['debug'] = [
+                'message' => $e->getMessage() ?? '',
+                'request' => $request->all(),
+            ];
+            return response()->json($response, 500);
+        }
+    }
+
+    public function senderStatus(Request $request)
+    {
+        try {
+            $status = $request->status;
+            $sender_id = $request->sender_id;
+
+            $sender = DB::transaction(function () use ($status, $sender_id) {
+                $sender = Sender::findOrFail($sender_id);
+                $sender->status = Sender::fromString($status);
+                $sender->save();
+
+                return $sender;
+            });
+
+            return response()->json([
+                'message' => 'อัพเดทสถาณะแล้ว',
+                'data' => $sender,
+                'code' => 200,
+            ], 200);
+
+        } catch (Throwable $e) {
+            $response = [
+                'message' => 'ไม่สามารถบันทึกข้อมูลได้ในขณะนี้',
+                'description' => 'เกิดข้อผิดพลาดระหว่างการบันทึกข้อมูล',
+                'code' => 500,
+            ];
+            if (config('app.debug')) $response['debug'] = [
+                'message' => $e->getMessage() ?? '',
+                'request' => $request->all(),
+            ];
+            return response()->json($response, 500);
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        try{
+            $sender_id = $request->sender_id;
+            DB::transaction(function () use ($sender_id) {
+                $sender = Sender::findOrFail($sender_id);
+                $sender->delete();
+            });
+
+            return response()->json([
+                'message' => 'ลบสำเร็จ',
+                'code' => 200,
+            ], 200);
+        } catch (Throwable $e) {
+            $response = [
+                'message' => 'ไม่สามารถบันทึกข้อมูลได้ในขณะนี้',
+                'description' => 'เกิดข้อผิดพลาดระหว่างการบันทึกข้อมูล',
+                'code' => 500,
+            ];
+            if (config('app.debug')) $response['debug'] = [
                 'message' => $e->getMessage() ?? '',
                 'request' => $request->all(),
             ];

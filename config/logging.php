@@ -127,6 +127,20 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // ===== SMS =====
+        'sms' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/sending/sms/sms.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        // ===== OTP =====
+        'otp' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/sending/otp/otp.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
     ],
 
 ];

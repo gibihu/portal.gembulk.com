@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->uuid('server_id')->nullable();
             $table->foreign('server_id')->references('id')->on('sd_servers')->onDelete('set null');
+
             $table->uuid('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 

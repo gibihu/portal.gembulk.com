@@ -6,53 +6,62 @@ use App\Http\Controllers\Controller;
 use App\Models\Sendings\Sender;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SenderAdminApiController extends Controller
 {
     public function senderRequestActions(Request $request)
     {
-        try{
-            $action = $request->action;
+        try {
+            $action = $request->action ?? 'pending';
             $sender_id = $request->sender_id;
 
-            $sender = Sender::find($sender_id);
-            if(!$sender){
-                return response()->json([
-                    'message' => 'ไม่พบชื่อนี้ในฐานข้อมูล',
-                    'code' => 404,
-                ], 404);
-            }
+            $sender = DB::transaction(function () use ($sender_id, $action) {
+                $sender = Sender::find($sender_id);
+                $sender->status = Sender::fromString($action);
+                $sender->save();
 
-            switch ($action) {
-                case 'accept':
-                    $sender->status = Sender::STATUS_COMPLETED;
-                    break;
-                case 'reject':
-                    $sender->status = Sender::STATUS_REJECTED;
-                    break;
-                default:
-                    $sender->status = Sender::STATUS_PENDING;
-            }
-
-            if($sender->save()){
-                return response()->json([
-                    'message' => 'ดำเนินการสำเร็จ',
-                    'data' => $sender,
-                    'code' => 200,
-                ], 200);
-            }else{
-                return response()->json([
-                    'message' => 'ไม่สามารถบันทึกได้ ลงอีกครั้ง',
-                    'code' => 422 ,
-                ], 422 );
-            }
-        }catch (Exception $e) {
+                return $sender;
+            });
+            return response()->json([
+                'message' => 'ดำเนินการสำเร็จ',
+                'data' => $sender,
+                'code' => 200,
+            ], 200);
+        } catch (Exception $e) {
             $response = [
                 'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
                 'description' => $e->getMessage() ?? '',
                 'code' => 500,
             ];
-            if(config('app.debug')) $response['debug'] = [
+            if (config('app.debug')) $response['debug'] = [
+                'message' => $e->getMessage() ?? '',
+                'request' => $request->all(),
+            ];
+            return response()->json($response, 500);
+        }
+    }
+
+    public function senderDestroy(Request $request)
+    {
+        try{
+            $sender_id = $request->id;
+            DB::transaction(function () use ($sender_id) {
+                $sender = Sender::find($sender_id);
+                $sender->delete();
+            });
+
+            return response()->json([
+                'message' => 'ลบสำเร็จ',
+                'code' => 200,
+            ],200);
+        } catch (Exception $e) {
+            $response = [
+                'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
+                'description' => $e->getMessage() ?? '',
+                'code' => 500,
+            ];
+            if (config('app.debug')) $response['debug'] = [
                 'message' => $e->getMessage() ?? '',
                 'request' => $request->all(),
             ];

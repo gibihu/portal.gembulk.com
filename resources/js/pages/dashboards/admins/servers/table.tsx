@@ -13,7 +13,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, SquarePen } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader, MoreHorizontal, Plus, SquarePen, Trash } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -38,8 +38,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ServerType } from "@/types/user";
-import { Link } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import web from "@/routes/web";
+import { toast } from "sonner";
+import api from "@/routes/api";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,78 +51,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 
-
-
-export const columns: ColumnDef<ServerType>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "name",
-        header: "Name",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.original.name}</div>
-        ),
-    },
-    {
-        accessorKey: "credit",
-        header: "Credit",
-        cell: ({ row }) => {
-            const amount = row.original.settings?.credits?.amount ?? 0;
-
-            return amount;
-        },
-    },
-    {
-        accessorKey: "host",
-        header: "Host",
-        cell: ({ row }) => {
-            const amount = row.original.host;
-
-            return <div className="max-w-md truncate">{String(amount)}</div>;
-        },
-    },
-    {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-            const payment = row.original
-
-            return (
-                <div className="flex gap-2">
-                    <Link href={web.dash.server.item({ id: row.original.id })} prefetch >
-                        <Button>
-                            <SquarePen />
-                        </Button>
-                    </Link>
-                </div>
-            )
-        },
-    },
-]
-
-
 export default function ServerTable({ items }: { items: any }) {
 
+    const csrfToken = usePage().props.csrf as string;
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -128,6 +61,119 @@ export default function ServerTable({ items }: { items: any }) {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+    const [isFetch, setIsFetch] = React.useState<boolean>(false);
+
+
+    function DeleteServer(id: string) {
+        const fetchData = async () => {
+            setIsFetch(true);
+            try {
+                const way = api.admins.servers.destroy();
+                const res = await fetch(way.url, {
+                    method: "DELETE",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        id: id
+                    })
+                });
+                const result = await res.json();
+                if(res.ok){
+                    toast.success(result.message);
+                    router.reload();
+                }else{
+                    toast.error(result.message, {description: `${result.description ?? result.description} ${result.code ?? '#'+result.code}`})
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                let message = "เกิดข้อผิดพลาดบางอย่าง";
+
+                if (error instanceof Error) {
+                    message = error.message;
+                } else if (typeof error === "string") {
+                    message = error;
+                }
+
+                toast.error(message);
+            } finally {
+                setIsFetch(false);
+            }
+        }
+        fetchData();
+    }
+
+    const createColumns = (DeleteServer: (id: string) => void, isFetch: () => boolean): ColumnDef<any>[] => [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
+        {
+            accessorKey: "name",
+            header: "Name",
+            cell: ({ row }) => (
+                <div className="capitalize">{row.original.name}</div>
+            ),
+        },
+        {
+            accessorKey: "host",
+            header: "Host",
+            cell: ({ row }) => {
+                const amount = row.original.host;
+
+                return <div className="max-w-md truncate">{String(amount)}</div>;
+            },
+        },
+        {
+            accessorKey: "user",
+            header: "Adder",
+            cell: ({ row }) => {
+                const name = row.original.user?.name ?? '-';
+
+                return <div className="max-w-md truncate">{name}</div>;
+            },
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({ row }) => {
+                const data = row.original
+
+                return (
+                    <div className="flex gap-2 justify-end me-4">
+                        <Link href={web.dash.admin.server.store.edit({ id: row.original.id })} prefetch >
+                            <Button>
+                                <SquarePen />
+                            </Button>
+                        </Link>
+                        <Button variant='danger' onClick={() => DeleteServer(data.id)}>
+                            {isFetch() ? <Loader className="animate-spin" /> : <Trash />}
+                        </Button>
+                    </div>
+                )
+            },
+        },
+    ]
+    const columns = createColumns(DeleteServer, () => isFetch);
 
     const table = useReactTable({
         data: items,
@@ -149,9 +195,9 @@ export default function ServerTable({ items }: { items: any }) {
     })
 
     return (
-        <div className="w-full">
-            <div className="flex items-center justify-end gap-2 py-4">
-                <Link href={web.dash.server.add().url}>
+        <div className="w-full flex flex-col gap-4">
+            <div className="flex items-center justify-end gap-2">
+                <Link href={web.dash.admin.server.store.add().url}>
                     <Button>
                         <Plus />
                     </Button>
@@ -184,7 +230,7 @@ export default function ServerTable({ items }: { items: any }) {
                 </DropdownMenu>
             </div>
             <div className="overflow-hidden rounded-md border">
-                <Table>
+                <Table className="bg-background">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -249,7 +295,7 @@ export default function ServerTable({ items }: { items: any }) {
                                 table.setPageSize(Number(value))
                             }}
                         >
-                            <SelectTrigger className="w-20" id="rows-per-page">
+                            <SelectTrigger className="w-20 h-9 bg-background" id="rows-per-page">
                                 <SelectValue
                                     placeholder={table.getState().pagination.pageSize}
                                 />
