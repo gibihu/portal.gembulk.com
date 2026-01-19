@@ -26,9 +26,7 @@ export default function SmsListPage(request: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <SendingTable items={items} />
-            </div>
+            <SendingTable items={items} />
         </AppLayout>
     );
 }

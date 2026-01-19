@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Apis\Servers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Sendings\Plan;
-use App\Models\Sendings\Server;
+use App\Models\Sendings\Servers\Server;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -30,7 +29,7 @@ class ServerApiController extends Controller
                 'code' => 200,
             ], 200);
 
-            
+
         }catch (Exception $e) {
             $response = [
                 'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',

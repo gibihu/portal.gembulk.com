@@ -2,59 +2,70 @@
 
 namespace App\Models\Sendings;
 
+use App\Models\Sendings\Servers\Server;
+use App\Models\Users\User;
+use App\Traits\GlobalStatusTrait;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use App\Trait\GlobalStatusTrait;
-use App\Models\Users\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Report extends Model
+class Campaign extends Model
 {
     use GlobalStatusTrait;
     use HasUuids;
-    protected $table = 'sd_reports';
+    protected $table = 'sd_campaigns';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
-        'receiver',
-        'msg',
-        'response',
-        'send_status',
-        'cost',
+        'name',
         'user_id',
-        'sender_id',
-        'server_id',
+        'action_key',
+        'receivers',
+        'message',
+        'data',
+        'total_cost',
         'status',
-        'is_scheduled',
+        'sender_name',
+        'sender_id',
+        'user_id',
+        'server_id',
+        'server_name',
+        'response',
+        'response_report',
+        'response_callback',
+        'sent_at',
         'scheduled_at',
     ];
-    protected $hidden = [
-        'server_id',
-        'sender_id',
-    ];
+
     protected $casts = [
-        'is_scheduled' => 'boolean',
-        'response' => 'json',
+        'data' => 'array',
+        'receivers' => 'array',
+        'response' => 'array',
+        'response_report' => 'array',
     ];
+
     protected $appends = [
         'status_text',
-    ];
-    protected $with = [
-        'server',
-        'sender',
-        'user',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
     public function server()
     {
         return $this->belongsTo(Server::class, 'server_id', 'id');
     }
+
     public function sender()
     {
         return $this->belongsTo(Sender::class, 'sender_id', 'id');
+    }
+
+    public function receiver_s(): HasMany
+    {
+        return $this->hasMany(CampaignReceiver::class, 'campaign_id');
     }
 }

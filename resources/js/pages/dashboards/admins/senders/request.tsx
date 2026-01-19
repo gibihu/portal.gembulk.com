@@ -10,6 +10,7 @@ import { SenderType } from "@/types/user";
 import { Head } from "@inertiajs/react";
 import { Check, Loader, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -65,17 +66,15 @@ export default function Dashboard(request: any) {
         }
     }
 
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-
-                <Card className="bg-primary">
-                    <CardHeader className="text-primary-foreground font-bold text-2xl">
-                        ตารางอนุมัติผู้ส่ง
-                    </CardHeader>
-                    <CardContent className="mx-6 bg-background rounded-2xl py-4">
+            <div className="flex flex-col gap-4">
+                <div className="text-primary-foreground font-bold text-2xl">
+                    ตารางอนุมัติผู้ส่ง
+                </div>
+                <Card className="p-0">
+                    <CardContent className="bg-background rounded-2xl p-0">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -91,27 +90,28 @@ export default function Dashboard(request: any) {
                                         <TableCell className="font-medium pl-6">{sender.name}</TableCell>
                                         <TableCell>{sender.user?.name}</TableCell>
                                         <TableCell>{sender.server?.name}</TableCell>
-                                        <TableCell className="flex gap-2">
+                                        <TableCell className="flex gap-2 justify-end me-4">
                                             {sender.status_text === 'pending' ? (
-                                                <>
-                                                    <Button variant="success" disabled={isFetch} onClick={() => Actions(sender.id, 'accept')}>
-                                                        {isFetch ? (
-                                                            <Loader className="animate-spin" />
-                                                        ) : (
-                                                            <Check />
-                                                        )}
-                                                    </Button>
-                                                    <Button variant="danger" disabled={isFetch} onClick={() => Actions(sender.id, 'reject')}>
-                                                        {isFetch ? (
-                                                            <Loader className="animate-spin" />
-                                                        ) : (
-                                                            <X />
-                                                        )}
-                                                    </Button>
-                                                </>
+                                                <Button variant="success" disabled={isFetch} onClick={() => Actions(sender.id, 'completed')}>
+                                                    {isFetch ? (
+                                                        <Loader className="animate-spin" />
+                                                    ) : (
+                                                        <Check />
+                                                    )}
+                                                </Button>
                                             ) : (
                                                 <Button variant="ghost">
                                                     <Check className="size-5 animate-rotate-y animate-once animate-ease-in-out" />
+                                                </Button>
+                                            )}
+
+                                            {sender.status_text !== 'rejected' && (
+                                                <Button variant="danger" disabled={isFetch} onClick={() => Actions(sender.id, 'rejected')}>
+                                                    {isFetch ? (
+                                                        <Loader className="animate-spin" />
+                                                    ) : (
+                                                        <X />
+                                                    )}
                                                 </Button>
                                             )}
                                         </TableCell>
@@ -121,7 +121,6 @@ export default function Dashboard(request: any) {
                         </Table>
                     </CardContent>
                 </Card>
-
             </div>
         </AppLayout>
     );

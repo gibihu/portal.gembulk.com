@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\Pages\Auth\LoginController;
-use App\Http\Controllers\Pages\Dashs\WebDashAdminPage;
+use App\Http\Controllers\Pages\Dashs\WebDashAdminPageController;
 use App\Http\Controllers\Pages\Dashs\WebDashPageController;
 use App\Http\Controllers\Pages\WebPageController;
+use App\Http\Controllers\Tests\CronjobTestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,38 +19,51 @@ Route::name('web.')->group(function () {
             Route::get('/', 'index')->name('home');
         });
 
-        Route::controller(WebDashPageController::class)->prefix('dashboard')->name('dash.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::prefix('server')->name('server.')->group(function () {
-                Route::get('add', 'serverAdd')->name('add');
-                Route::get('lists', 'serverLists')->name('lists');
-                Route::get('{id}', 'serverItem')->name('item');
-            });
-            Route::prefix('senders')->name('senders.')->group(function () {
-                Route::get('add', 'senderAdd')->name('add');
-            });
-            Route::prefix('create')->name('create.')->group(function () {
-                Route::get('sms', 'createSMS')->name('sms');
-                Route::get('otp', 'createOTP')->name('otp');
-            });
-            Route::prefix('sending')->name('sending.')->group(function () {
-                Route::get('sms', 'sendingSMS')->name('sms');
-                Route::get('otp', 'sendingOTP')->name('otp');
-            });
-            Route::prefix('jobs')->name('jobs.')->group(function () {
-                Route::get('sms', 'jobSMS')->name('sms');
-                Route::get('otp', 'jobOTP')->name('otp');
-            });
-            Route::prefix('reports')->name('report.')->group(function () {
-                Route::get('sms', 'reportSMS')->name('sms');
-                Route::get('otp', 'reportOTP')->name('otp');
+        Route::prefix('dashboard')->name('dash.')->group(function () {
+            Route::controller(WebDashPageController::class)->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::prefix('senders')->name('senders.')->group(function () {
+                    Route::get('add', 'senderAdd')->name('add');
+                });
+
+
+                Route::prefix('sending')->name('sending.')->group(function () {
+                    Route::prefix('sms')->name('sms.')->group(function () {
+                        Route::get('add', 'smsAdd')->name('add');
+                    });
+                    Route::get('otp', 'sendingOTP')->name('otp');
+                });
+                Route::prefix('jobs')->name('jobs.')->group(function () {
+                    Route::get('sms', 'jobSMS')->name('sms');
+                    Route::get('otp', 'jobOTP')->name('otp');
+                });
+                Route::prefix('reports')->name('report.')->group(function () {
+                    Route::get('sms', 'reportSMS')->name('sms');
+                    Route::get('otp', 'reportOTP')->name('otp');
+                });
             });
 
-            Route::controller(WebDashAdminPage::class)->prefix('admin')->name('admin.')->group(function () {
+            Route::controller(WebDashAdminPageController::class)->prefix('admin')->name('admin.')->group(function () {
                 Route::prefix('senders')->name('senders.')->group(function () {
                     Route::get('requests', 'senderRequests')->name('requests');
                 });
+
+                Route::prefix('server')->name('server.')->group(function () {
+                    Route::prefix('store')->name('store.')->group(function () {
+                        Route::get('add', 'serverStoreAdd')->name('add');
+                        Route::get('{id}', 'serverStoreEdit')->name('edit');
+                    });
+                    Route::get('lists', 'serverLists')->name('lists');
+                });
             });
+        });
+    });
+});
+
+Route::controller(CronjobTestController::class)->prefix('test')->name('test.')->group(function () {
+    Route::prefix('cronjob')->name('cronjob.')->group(function () {
+        Route::prefix('sending')->name('sending.')->group(function () {
+            Route::get('sms', 'sendingSMS')->name('sms');
         });
     });
 });

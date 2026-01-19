@@ -1,40 +1,20 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Http\Controllers\Tests;
 
-use App\Helpers\ServerHelper;
 use App\Helpers\Servers\Actions\ActionServerHelper;
-use App\Http\Controllers\Sendings\SMSSendingController;
+use App\Http\Controllers\Controller;
 use App\Models\Sendings\Campaign;
 use App\Models\Sendings\CampaignReceiver;
-use App\Models\Sendings\SendingJob;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class SendSms extends Command
+class CronjobTestController extends Controller
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:send-sms';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function sendingSMS()
     {
         $action_key_upper = 'SMS';
         Log::channel('sms')->info('---> Start Sending ' . $action_key_upper);

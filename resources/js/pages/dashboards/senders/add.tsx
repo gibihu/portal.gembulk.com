@@ -14,7 +14,7 @@ import { SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head } from "@inertiajs/react";
 import { url } from "inspector";
-import { Trash } from "lucide-react";
+import { Loader, Play, Square, Trash } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Add Sender',
-        href: web.dash.server.add().url,
+        href: web.dash.senders.add().url,
     },
 ];
 
@@ -38,6 +38,7 @@ export default function AddSenderPage(request: any) {
     const [user, setUser] = useState<UserType>(request.auth ? (request.auth.user ?? {}) : {});
     const [servers, setServers] = useState<ServerType[]>([]);
     const [selectedServer, setSelectedServer] = useState<ServerType | null>(servers?.length > 0 ? servers[0] : null);
+
 
     const server_info_schema = z.object({
         request_id: z.string("ระบบไม่พบรหัสเซิฟเวอร์ กรุณาลองใหม่อีกครั้ง"),
@@ -61,6 +62,11 @@ export default function AddSenderPage(request: any) {
 
             setServers(serversData);
             setSelectedServer(serversData.length > 0 ? serversData[0] : null);
+
+            if (serversData.length == 0) {
+                setIsFetch(true);
+                toast.error('ไม่พบเซิฟเวอร์', { description: "ระบบไม่พบเซิฟเวอร์ กรุณาซื้อแพ็กเกจ" });
+            }
         };
 
         fetchServers();
@@ -95,8 +101,100 @@ export default function AddSenderPage(request: any) {
                                 : server
                         )
                     );
-
                     form.reset();
+                } else {
+                    toast.error(res.message);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            } finally {
+                setIsFetch(false);
+            }
+        };
+
+        fetchData();
+    }
+
+    function updateStatus(sender_id: string, status: string) {
+        const fetchData = async () => {
+            setIsFetch(true);
+            try {
+                const way = api.senders.status();
+                const response = await fetch(way.url, {
+                    method: way.method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        sender_id: sender_id,
+                        status: status,
+                    }),
+                });
+                const res = await response.json();
+                if (response.ok) {
+                    setServers(prev =>
+                        prev.map(server => {
+                            if (!server.senders) return server;
+
+                            const hasSender = server.senders.some(
+                                sender => sender.id === res.data.id
+                            );
+
+                            if (!hasSender) return server;
+
+                            return {
+                                ...server,
+                                senders: server.senders.map(sender =>
+                                    sender.id === res.data.id
+                                        ? res.data
+                                        : sender
+                                ),
+                            };
+                        })
+                    );
+                } else {
+                    toast.error(res.message);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            } finally {
+                setIsFetch(false);
+            }
+        };
+
+        fetchData();
+    }
+
+    function onDelete(sender_id: string) {
+        const fetchData = async () => {
+            setIsFetch(true);
+            try {
+                const way = api.senders.delete();
+                const response = await fetch(way.url, {
+                    method: way.method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        sender_id: sender_id,
+                    }),
+                });
+                const res = await response.json();
+                if (response.ok) {
+                    setServers(prev =>
+                        prev.map(server => {
+                            if (!server.senders) return server;
+
+                            return {
+                                ...server,
+                                senders: server.senders.filter(
+                                    sender => sender.id !== sender_id
+                                ),
+                            };
+                        })
+                    );
                 } else {
                     toast.error(res.message);
                 }
@@ -113,7 +211,7 @@ export default function AddSenderPage(request: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
 
                 <Form
                     {...form}
@@ -122,7 +220,7 @@ export default function AddSenderPage(request: any) {
                         <div className="flex flex-col gap-4">
                             <div className="w-full flex justify-between items-center">
                                 <Select defaultValue={servers?.[0]?.id?.toString()} value={selectedServer?.id.toString()}>
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger className="w-[180px] bg-background">
                                         <SelectValue placeholder="เลือกเซิฟเวอร์" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -157,7 +255,9 @@ export default function AddSenderPage(request: any) {
                                     />
                                     <div className="w-full flex justify-end">
                                         <Button type="submit" disabled={isFetch}>
-                                            {isFetch ? "กำลังส่งคำขอ..." : "ส่งคำขอ"}
+                                            {
+                                                isFetch ? (<Loader className="animate-spin" />) : ("ส่งคำขอ")
+                                            }
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -171,28 +271,53 @@ export default function AddSenderPage(request: any) {
                     {servers.map((server: ServerType, index: number) => (
                         <>
                             <CardHeader className="font-bold">
-                                {server.name}
+                                เซิฟเวอร์ {server.name}
                             </CardHeader>
                             <CardContent className="px-12">
                                 <ul className="list-disc">
                                     {server.senders?.map((sender: SenderType, sender_index: number) => (
                                         <li key={sender.id}>
-                                            <div className="flex justify-between">
+                                            <div className="flex justify-between items-center">
                                                 <span>
                                                     <span>{sender.name} </span>
                                                     <span className="text-muted-foreground">{sender.user_id == null && "(ฟรี)"}</span>
                                                     {
                                                         sender.status_text == "pending" ? <span className="text-amber-500">(รออนุมัติ)</span>
                                                             :
-                                                            sender.status_text == 'approved' ? <span className="text-green-500">(อนุมัติแล้ว)</span>
-                                                                : null
+                                                            sender.status_text == "completed" ? <span className="text-green-300">(อนุมัติแล้ว)</span>
+                                                                :
+                                                                sender.status_text == "active" ? <span className="text-green-500">(ใช้งาน)</span>
+                                                                    :
+                                                                    sender.status_text == "inactive" ? <span className="text-muted-foreground">(ไม่ใช้งาน)</span>
+                                                                        :
+                                                                        sender.status_text == "rejected" ? <span className="text-danger">(ปฏิเสธ)</span>
+                                                                            : null
                                                     }
                                                 </span>
-                                                {sender.user_id !== null && (
-                                                    <Button variant="ghost" className="h-auto py-2 w-auto">
-                                                        <Trash />
-                                                    </Button>
-                                                )}
+                                                <div className="flex gap-1">
+                                                    {
+                                                        sender.status_text == "completed" || sender.status_text == "inactive" ?
+                                                            <Button variant="ghost" className="hover:bg-success hover:text-success-foreground"
+                                                                onClick={() => updateStatus(sender.id, 'active')}
+                                                            >
+                                                                <Play />
+                                                            </Button>
+                                                            : sender.status_text == "active" && sender.user_id !== null ?
+                                                                <Button variant="ghost" className="hover:bg-danger hover:text-danger-foreground"
+                                                                    onClick={() => updateStatus(sender.id, 'inactive')}
+                                                                >
+                                                                    <Square />
+                                                                </Button>
+                                                                : null
+                                                    }
+                                                    {sender.user_id !== null && (
+                                                        <Button variant="ghost" className="h-auto py-2 w-auto"
+                                                            onClick={() => onDelete(sender.id)}
+                                                        >
+                                                            <Trash />
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </li>
                                     ))}
