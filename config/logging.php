@@ -128,16 +128,21 @@ return [
         ],
 
         // ===== SMS =====
-        'sms' => [
+        'sms_sent' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/sending/sms/sms.log'),
+            'path' => storage_path('logs/cronjobs/sms/sent/sms.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+        'sms_report' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/cronjobs/sms/report/sms.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
         // ===== OTP =====
         'otp' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/sending/otp/otp.log'),
+            'path' => storage_path('logs/cronjobs/otp/otp.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 

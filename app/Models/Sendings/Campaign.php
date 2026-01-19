@@ -32,8 +32,9 @@ class Campaign extends Model
         'server_id',
         'server_name',
         'response',
-        'response_report',
         'response_callback',
+        'response_report',
+        'response_report_callback',
         'sent_at',
         'scheduled_at',
     ];

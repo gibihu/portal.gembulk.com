@@ -37,7 +37,7 @@ class SendSms extends Command
     public function handle()
     {
         $action_key_upper = 'SMS';
-        Log::channel('sms')->info('---> Start Sending ' . $action_key_upper);
+        Log::channel('sms.sent')->info('---> Start Sending ' . $action_key_upper);
 
         try {
             $limit = 50;
@@ -47,7 +47,7 @@ class SendSms extends Command
                 ->cursor()
                 ->each(function ($item) {
 
-                    Log::channel('sms')->info('--> Processing "' . $item->name . '"');
+                    Log::channel('sms.sent')->info('--> Processing "' . $item->name . '"');
 
                     // 1. เช็คว่า server รองรับ scheduled_at ไหม
                     $serverSupportSchedule = collect($item->server->action_sms->body)
@@ -60,13 +60,13 @@ class SendSms extends Command
                     if (!$serverSupportSchedule && $itemHasSchedule) {
 
                         if (now()->lt($item->scheduled_at)) {
-                            Log::channel('sms')->info('--> Skip: Not time yet');
+                            Log::channel('sms.sent')->info('--> Skip: Not time yet');
                             return; // ⛔ ยังไม่ถึงเวลา ข้าม
                         }
 
-                        Log::channel('sms')->info('--> Time reached, continue sending');
+                        Log::channel('sms.sent')->info('--> Time reached, continue sending');
                     } else {
-                        Log::channel('sms')->info('--> Server supports schedule, send immediately');
+                        Log::channel('sms.sent')->info('--> Server supports schedule, send immediately');
                     }
 
                     // 4. เริ่มประมวลผล
@@ -74,20 +74,20 @@ class SendSms extends Command
                     $item->save();
 
                     if ($item->action_key === 'sms') {
-                        Log::channel('sms')->info('--> Action Is "' . $item->action_key . '"');
+                        Log::channel('sms.sent')->info('--> Action Is "' . $item->action_key . '"');
 
                         $item = ActionServerHelper::ActionSMS($item);
 
                         $item->status = Campaign::STATUS_UNDER_REVIEW;
                         $item->save();
 
-                        Log::channel('sms')->info('--> Action completed');
+                        Log::channel('sms.sent')->info('--> Action completed');
                     }
                 });
         } catch (Throwable $e) {
-            Log::channel('sms')->error('--> Error: ' . $e->getMessage());
+            Log::channel('sms.sent')->error('--> Error: ' . $e->getMessage());
         }
 
-        Log::channel('sms')->info('---> End Sending ' . $action_key_upper);
+        Log::channel('sms.sent')->info('---> End Sending ' . $action_key_upper);
     }
 }

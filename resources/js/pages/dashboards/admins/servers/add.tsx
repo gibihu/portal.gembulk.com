@@ -482,7 +482,13 @@ function ActionSendCard({
         { label: "campaign name", value: "campaign_name" },
         { label: "sender name", value: "sender_name" },
         { label: "limit", value: "limit" },
-        { label: "credit", value: "credit" }
+        { label: "credit", value: "credit" },
+        { label: "total receiver", value: "total_receiver" },
+        { label: "sent", value: "sent" },
+        { label: "success", value: "success" },
+        { label: "failed", value: "failed" },
+        { label: "pending", value: "pending" },
+        { label: "credits refund", value: "credits_refund" },
     ];
     return (
         <Card className="p-0 overflow-hidden">
