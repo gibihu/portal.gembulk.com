@@ -22,8 +22,9 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0);
             $table->string('sender_name');
             $table->json('response')->nullable();
-            $table->json('response_report')->nullable();
             $table->json('response_callback')->nullable();
+            $table->json('response_report')->nullable();
+            $table->json('response_report_callback')->nullable();
 
             $table->uuid('sender_id')->nullable();
             $table->foreign('sender_id')->references('id')->on('sd_senders')->onDelete('set null');

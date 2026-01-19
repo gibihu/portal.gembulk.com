@@ -51,14 +51,16 @@ class Server extends Model
     {
         return $this->hasMany(ServerAction::class, 'server_id');
     }
-    public function actionSMS(): HasMany
-    {
-        return $this->actions()->where('action_key', 'sms');
-    }
     public function getActionSmsAttribute()
     {
         return $this->actions()
             ->where('action_key', 'sms')
+            ->first();
+    }
+    public function getActionReportSmsAttribute()
+    {
+        return $this->actions()
+            ->where('action_key', 'sms_report')
             ->first();
     }
 

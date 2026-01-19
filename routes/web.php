@@ -63,7 +63,10 @@ Route::name('web.')->group(function () {
 Route::controller(CronjobTestController::class)->prefix('test')->name('test.')->group(function () {
     Route::prefix('cronjob')->name('cronjob.')->group(function () {
         Route::prefix('sending')->name('sending.')->group(function () {
-            Route::get('sms', 'sendingSMS')->name('sms');
+            Route::prefix('sms')->name('sms.')->group(function () {
+                Route::get('/', 'sendingSMS')->name('index');
+                Route::get('reports', 'ReportSMS')->name('reports');
+            });
         });
     });
 });

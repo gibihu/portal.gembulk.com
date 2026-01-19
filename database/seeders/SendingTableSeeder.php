@@ -116,8 +116,20 @@ class SendingTableSeeder extends Seeder
                     "message" => "message"
                 ],
                 [
-                    "ref_id" => "campaign_id"
-                ]
+                    "credits_refund" => "campaigns.0.credits_refund"
+                ],
+                [
+                    "total_receiver" => "campaigns.0.all_numbers"
+                ],
+                [
+                    "sent" => "campaigns.0.sent"
+                ],
+                [
+                    "failed" => "campaigns.0.failed"
+                ],
+                [
+                    "pending" => "campaigns.0.pending"
+                ],
             ],
                 "settings" => null,
                 "status" => 0,
