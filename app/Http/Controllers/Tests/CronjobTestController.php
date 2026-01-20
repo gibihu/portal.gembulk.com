@@ -40,7 +40,7 @@ class CronjobTestController extends Controller
                     if (!$serverSupportSchedule && $itemHasSchedule) {
 
                         if (now()->lt($item->scheduled_at)) {
-                            Log::channel('sms_sent')->info('--> Skip: Not time yet');
+//                            Log::channel('sms_sent')->info('--> Skip: Not time yet');
                             return; // ⛔ ยังไม่ถึงเวลา ข้าม
                         }
 
