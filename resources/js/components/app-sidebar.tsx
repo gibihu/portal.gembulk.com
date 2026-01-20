@@ -102,19 +102,9 @@ export function AppSidebar() {
                 },
                 {
                     title: "Reports",
-                    href: web.dash.report.sms().url,
+                    href: web.dash.campaigns.reports().url,
                     icon: Layers,
                     isActive: false,
-                    items: [
-                        {
-                            title: "SMS",
-                            href: web.dash.report.sms().url,
-                        },
-                        {
-                            title: "OTP",
-                            href: web.dash.report.otp().url,
-                        },
-                    ],
                 },
             ],
         },

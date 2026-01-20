@@ -38,12 +38,8 @@ class SendingTableSeeder extends Seeder
                 "method" => "POST",
                 "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/send",
                 "headers" => [
-                    [
-                        "Content-Type" => "application/json"
-                    ],
-                    [
-                        "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu"
-                    ]
+                    "Content-Type" => "application/json",
+                    "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
@@ -64,15 +60,10 @@ class SendingTableSeeder extends Seeder
                     ]
                 ],
                 "response" => [
-                    [
-                        "status" => "success"
-                    ],
-                    [
-                        "message" => "message"
-                    ],
-                    [
-                        "ref_id" => "campaign_id"
-                    ]
+                    "success" => "success",
+                    "message" => "message",
+                    "ref_id" => "campaign_id",
+                    "credits" => "credits",
                 ],
                 "settings" => null,
                 "status" => 0,
@@ -83,54 +74,27 @@ class SendingTableSeeder extends Seeder
                 "method" => "GET",
                 "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/report",
                 "headers" => [
-                    [
-                        "Content-Type" => "application/json"
-                    ],
-                    [
-                        "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu"
-                    ]
+                    "Content-Type" => "application/json",
+                    "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
                         "ref_id" => "campaign_id",
                         "isArray" => false
                     ],
-                    [
-                        "campaign_name" => "campaign_name",
-                        "isArray" => false
-                    ],
-                    [
-                        "sender_name" => "sender_name",
-                        "isArray" => false
-                    ],
-                    [
-                        "limit" => "50",
-                        "isArray" => false
-                    ]
                 ],
-            "response" => [
-                [
-                    "status" => "success"
+                "response" => [
+                    "message" => "message",
+                    "credits_refund" => "campaigns.0.credits_refund",
+                    "total_receiver" => "campaigns.0.all_numbers",
+                    "passed" => "campaigns.0.success",
+                    "sent" => "campaigns.0.sent",
+                    "failed" => "campaigns.0.failed",
+                    "pending" => "campaigns.0.pending",
+                    "sender_name" => "campaigns.0.sender_name",
+                    "ref_id" => "campaigns.0.id",
+                    "campaign_name" => "campaigns.0.campaign_name",
                 ],
-                [
-                    "message" => "message"
-                ],
-                [
-                    "credits_refund" => "campaigns.0.credits_refund"
-                ],
-                [
-                    "total_receiver" => "campaigns.0.all_numbers"
-                ],
-                [
-                    "sent" => "campaigns.0.sent"
-                ],
-                [
-                    "failed" => "campaigns.0.failed"
-                ],
-                [
-                    "pending" => "campaigns.0.pending"
-                ],
-            ],
                 "settings" => null,
                 "status" => 0,
             ],
@@ -140,9 +104,8 @@ class SendingTableSeeder extends Seeder
                 "method" => "POST",
                 "endpoint" => "",
                 "headers" => [
-                    [
-                        "Content-Type" => "application/json"
-                    ]
+                    "Content-Type" => "application/json",
+                    "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
@@ -163,15 +126,9 @@ class SendingTableSeeder extends Seeder
                     ]
                 ],
                 "response" => [
-                    [
-                        "status" => "success"
-                    ],
-                    [
-                        "message" => "message"
-                    ],
-                    [
-                        "ref_id" => "campaign_id"
-                    ]
+                    "status" => "success",
+                    "message" => "message",
+                    "ref_id" => "campaign_id"
                 ],
                 "settings" => null,
                 "status" => 0,
@@ -182,9 +139,8 @@ class SendingTableSeeder extends Seeder
                 "method" => "POST",
                 "endpoint" => "",
                 "headers" => [
-                    [
-                        "Content-Type" => "application/json"
-                    ]
+                    "Content-Type" => "application/json",
+                    "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
@@ -205,15 +161,9 @@ class SendingTableSeeder extends Seeder
                     ]
                 ],
                 "response" => [
-                    [
-                        "status" => "success"
-                    ],
-                    [
-                        "message" => "message"
-                    ],
-                    [
-                        "ref_id" => "campaign_id"
-                    ]
+                    "status" => "success",
+                    "message" => "message",
+                    "ref_id" => "campaign_id"
                 ],
                 "settings" => null,
                 "status" => 0,
@@ -285,7 +235,7 @@ class SendingTableSeeder extends Seeder
                 'roles' => [$role1->id, $role2->id],
                 'plan_id' => $plan->id,
                 'email_verified_at' => now(),
-                'credit' => 1000000,
+                'credits' => 1000000,
             ]
         );
 

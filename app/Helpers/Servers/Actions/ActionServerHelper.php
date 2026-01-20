@@ -11,35 +11,51 @@ class ActionServerHelper
 {
     public static function ActionSMS(Campaign $item): Campaign|bool|array
     {
-        try{
-            $now = Carbon::now();
-            $server = $item->server;
-            $ac = $server->action_sms;
-            if(empty($ac->endpoint) || empty($ac->method)){ return false; }
+        $now = Carbon::now();
+        $server = $item->server;
+        $ac = $server->action_sms;
+        if(empty($ac->endpoint) || empty($ac->method)){ return false; }
 
-            $sender = $item->sender;
-            $headers = ActionServerHelper::GetKeyValue($ac->headers);
-            $param = ActionServerHelper::SortBody($ac->body, $item, $sender);
+        $sender = $item->sender;
+        $headers = $ac->headers;
+        $param = ActionServerHelper::SortBody($ac->body, $item, $sender);
 
 
-            $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
-            if($sent !== false){
-                [$item->response, $item->response_callback] = $sent;
-                $item->sent_at = $now->format('Y-m-d H:i:s');
+        $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
+        if($sent !== false){
+            [$item->response, $item->response_callback] = $sent;
+            if (($item->response_callback['status'] ?? null) == 200 || ($item->response_callback['status'] ?? null) == 201) {
                 $item->status = Campaign::STATUS_UNDER_REVIEW;
-                $item->receiver_s->each(function ($i) use ($item) {
-                    $i->status = $item->status;
-                    $i->save();
-                });
             }else{
                 $item->status = Campaign::STATUS_FAILED;
+                $item->user->credits += $item->total_cost ?? 0;
+                $item->user->save();
+                $item->response_report_callback = [
+                    "success" => false,
+                    "status" => $item->response_callback['status'] ?? 400,
+                    "message" => $item->response_callback['message'],
+                    "ref_id" => null,
+                    "campaign_name" => null,
+                    "sender_name" => null,
+                    "limit" => null,
+                    "credits" => null,
+                    "total_receiver" => count($item->receivers) ?? 1,
+                    "sent" => 0,
+                    "failed" => count($item->receivers) ?? 1,
+                    "pending" => 0,
+                    "credits_refund" => $item->total_cost,
+                    "passed" => 0
+                ];
             }
-            return $item;
-        }catch (Throwable $e){
-            return[
-                'message' => $e->getMessage(),
-            ];
+            $item->sent_at = $now->format('Y-m-d H:i:s');
+            $item->receiver_s->each(function ($i) use ($item) {
+                $i->status = $item->status;
+                $i->save();
+            });
+        }else{
+            $item->status = Campaign::STATUS_FAILED;
         }
+        return $item;
     }public static function ActionReportSMS(Campaign $item): Campaign|bool|array
     {
         try{
@@ -49,17 +65,19 @@ class ActionServerHelper
             if(empty($ac->endpoint) || empty($ac->method)){ return false; }
 
             $sender = $item->sender;
-            $headers = ActionServerHelper::GetKeyValue($ac->headers);
+            $headers = $ac->headers;
             $param = ActionServerHelper::SortBody($ac->body, $item, $sender);
 
 
             $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
             if($sent !== false){
                 [$item->response_report, $item->response_report_callback] = $sent;
-                $item->user->credit += $item->response_callback['credits_refund'] ?? 0;
+                $item->user->credits += $item->response_callback['credits_refund'] ?? 0;
                 $item->user->save();
                 $item->sent_at = $now->format('Y-m-d H:i:s');
-                $item->status = Campaign::STATUS_COMPLETED;
+                if($item->response_report_callback['pending'] == 0){
+                    $item->status = Campaign::STATUS_COMPLETED;
+                }
                 $item->receiver_s->each(function ($i) use ($item) {
                     $i->status = $item->status;
                     $i->save();
@@ -94,79 +112,78 @@ class ActionServerHelper
         return $items;
     }
 
+    /**
+     * @throws Throwable
+     */
     public static function SortBody(array $array, Campaign $item, Sender $sender): array
     {
-        try{
-            $now = Carbon::now();
-            $param = [];
-            foreach ($array as $body) {
-                if (empty($body)) {
-                    return false;
-                }
-                if (!empty($body['message'])) {
-                    $param[$body['message']] = $item->message;
-                }
+        $now = Carbon::now();
+        $param = [];
+        foreach ($array as $body) {
+            if (empty($body)) {
+                return false;
+            }
+            if (!empty($body['message'])) {
+                $param[$body['message']] = $item->message;
+            }
 
 // sender
-                if (!empty($body['sender'])) {
-                    $param[$body['sender']] = $sender->name;
-                }
+            if (!empty($body['sender'])) {
+                $param[$body['sender']] = $sender->name;
+            }
 
 // receivers
-                if (!empty($body['receivers'])) {
-                    $param[$body['receivers']] = $item->receivers;
-                }
+            if (!empty($body['receivers'])) {
+                $param[$body['receivers']] = $item->receivers;
+            }
 
 // scheduled_at
 //                $isScheduled = filter_var($body['scheduled_at'] ?? false, FILTER_VALIDATE_BOOLEAN);
-                if (!empty($body['scheduled_at'])) {
-                    $param[$body['scheduled_at']] = $item->scheduled_at ?? null;
-                }
+            if (!empty($body['scheduled_at'])) {
+                $param[$body['scheduled_at']] = $item->scheduled_at ?? null;
+            }
 
 // scheduled_at_date / time
-                if ($item->scheduled_at) {
+            if ($item->scheduled_at) {
 
-                    if (!empty($body['scheduled_at_date'])) {
-                        $param[$body['scheduled_at_date']] =
-                            Carbon::parse($item->scheduled_at)->format('Y-m-d');
-                    }
-
-                    if (!empty($body['scheduled_at_time'])) {
-                        $param[$body['scheduled_at_time']] =
-                            Carbon::parse($item->scheduled_at)->format('H:i:s');
-                    }
+                if (!empty($body['scheduled_at_date'])) {
+                    $param[$body['scheduled_at_date']] =
+                        Carbon::parse($item->scheduled_at)->format('Y-m-d');
                 }
 
-// api key (บาง provider ใช้ชื่อไม่เหมือนกัน)
-                if (!empty($body['api_key'])) {
-                    $param[$body['api_key']] = $body['api_key'] ?? null;
-                }
-
-                if (!empty($body['key'])) {
-                    $param[$body['key']] = $body['key'] ?? null;
-                }
-
-// now_date / now_time
-                if (!empty($body['now_date'])) {
-                    $param[$body['now_date']] = $now->format('Y-m-d');
-                }
-
-                if (!empty($body['now_time'])) {
-                    $param[$body['now_time']] = $now->format('H:i:s');
-                }
-
-                if (!empty($body['ref_id'])) {
-                    $param[$body['ref_id']] = $item->response_callback ? ($item->response_callback['ref_id'] ?? null) : null;
-                }
-
-                if (!empty($body['campaign_name'])) {
-                    $param[$body['campaign_name']] = $sender->name ?? null;
+                if (!empty($body['scheduled_at_time'])) {
+                    $param[$body['scheduled_at_time']] =
+                        Carbon::parse($item->scheduled_at)->format('H:i:s');
                 }
             }
-            return $param;
-        }catch (Throwable $e){
-            return $e;
+
+// api key (บาง provider ใช้ชื่อไม่เหมือนกัน)
+            if (!empty($body['api_key'])) {
+                $param[$body['api_key']] = $body['api_key'] ?? null;
+            }
+
+            if (!empty($body['key'])) {
+                $param[$body['key']] = $body['key'] ?? null;
+            }
+
+// now_date / now_time
+            if (!empty($body['now_date'])) {
+                $param[$body['now_date']] = $now->format('Y-m-d');
+            }
+
+            if (!empty($body['now_time'])) {
+                $param[$body['now_time']] = $now->format('H:i:s');
+            }
+
+            if (!empty($body['ref_id'])) {
+                $param[$body['ref_id']] = $item->response_callback ? ($item->response_callback['ref_id'] ?? null) : null;
+            }
+
+            if (!empty($body['campaign_name'])) {
+                $param[$body['campaign_name']] = $sender->name ?? null;
+            }
         }
+        return $param;
     }
 
     public static function sendRequest($ac, $method, $endpoint, $header, $param)
@@ -229,27 +246,21 @@ class ActionServerHelper
                 null
             );
 
-            $callback['credit'] = ActionServerHelper::getByPath(
+            $callback['credits'] = ActionServerHelper::getByPath(
                 $result,
-                $mapping['credit'] ?? 'credit',
+                $mapping['credits'] ?? 'credits',
                 null
             );
 
             $callback['total_receiver'] = ActionServerHelper::getByPath(
                 $result,
-                $mapping['credits_refund'] ?? 'credits_refund',
+                $mapping['total_receiver'] ?? 'credits_refund',
                 0
             );
 
             $callback['sent'] = ActionServerHelper::getByPath(
                 $result,
                 $mapping['sent'] ?? 'sent',
-                0
-            );
-
-            $callback['success'] = ActionServerHelper::getByPath(
-                $result,
-                $mapping['success'] ?? 'success',
                 0
             );
 
@@ -268,6 +279,12 @@ class ActionServerHelper
             $callback['credits_refund'] = ActionServerHelper::getByPath(
                 $result,
                 $mapping['credits_refund'] ?? 'credits_refund',
+                0
+            );
+
+            $callback['passed'] = ActionServerHelper::getByPath(
+                $result,
+                $mapping['passed'] ?? 'passed',
                 0
             );
 

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import * as React from "react";
 
-import { ReportType } from "@/types/user";
+import { CampaignType } from "@/types/user";
 import ReportTable from "../table";
 import web from "@/routes/web";
 
@@ -17,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function SmsListPage(request: any) {
-    const [items, setItems] = React.useState<ReportType[]>(request.reports as ReportType[]);
+    const [items, setItems] = React.useState<CampaignType[]>(request.reports as CampaignType[]);
 
     useEffect(() => {
         console.log(request);
@@ -26,7 +26,7 @@ export default function SmsListPage(request: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
                 <ReportTable items={items} />
             </div>
         </AppLayout>

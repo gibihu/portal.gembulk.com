@@ -57,8 +57,6 @@ class CronjobTestController extends Controller
                         Log::channel('sms_sent')->info('--> Action Is "' . $item->action_key . '"');
 
                         $item = ActionServerHelper::ActionSMS($item);
-
-                        $item->status = Campaign::STATUS_UNDER_REVIEW;
                         $item->save();
 
                         Log::channel('sms_sent')->info('--> Action completed');

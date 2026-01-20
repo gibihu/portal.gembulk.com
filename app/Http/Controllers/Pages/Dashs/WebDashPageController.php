@@ -40,10 +40,10 @@ class WebDashPageController extends Controller
         return Inertia::render('dashboards/sendings/sms/list', compact('jobs'));
     }
 
-    public function reportSMS(Request $request)
+    public function reportCampaigns(Request $request)
     {
-        $reports = CampaignReceiver::without(['user', 'server'])->where('user_id', $request->user()->id)->orderBy('created_at', 'DESC')->limit(1000)->get();
-        return Inertia::render('dashboards/reports/sms/list', compact('reports'));
+        $campaigns = Campaign::where('user_id', $request->user()->id)->orderBy('created_at', 'DESC')->limit(100)->get();
+        return Inertia::render('dashboards/campaigns/reports', compact('campaigns'));
     }
 
     public function senderAdd(Request $request)

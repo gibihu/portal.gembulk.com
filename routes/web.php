@@ -41,6 +41,9 @@ Route::name('web.')->group(function () {
                     Route::get('sms', 'reportSMS')->name('sms');
                     Route::get('otp', 'reportOTP')->name('otp');
                 });
+                Route::prefix('campaigns')->name('campaigns.')->group(function () {
+                    Route::get('reports', 'reportCampaigns')->name('reports');
+                });
             });
 
             Route::controller(WebDashAdminPageController::class)->prefix('admin')->name('admin.')->group(function () {

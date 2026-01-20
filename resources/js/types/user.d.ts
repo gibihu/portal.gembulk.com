@@ -7,7 +7,7 @@ export interface UserType {
     username: string;
     email: string;
     email_verified_at?: string;
-    credit: number;
+    credits: number;
     senders?: string[];
     plan_id?: string;
     plan: PlanType;
@@ -111,9 +111,10 @@ export interface CampaignType {
     status: number;
     status_text: string;
     sender_name: string;
-    response: any[];
-    response_report: any[];
-    response_callback: any[];
+    response?: any;
+    response_callback?: any;
+    response_report?: any;
+    response_report_callback?: any;
     sender_id: string;
     sender?: SenderType;
     user_id: string;

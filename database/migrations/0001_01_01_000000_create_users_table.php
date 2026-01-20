@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            $table->bigInteger('credit')->default(0);
+            $table->bigInteger('credits')->default(0);
 
             $table->json('senders')->nullable(); // sender จะไม่ผูกกับ user แต่ user ก็สามารถมร sender เองได้
             $table->char('plan_id', 36)->nullable();

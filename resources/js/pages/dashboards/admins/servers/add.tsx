@@ -206,7 +206,7 @@ export default function AddServerPage(request: any) {
     });
 
     function submit(formData: FormValues) {
-        
+
         const fetchData = async () => {
             try {
                 const way = api.admins.servers.store();
@@ -476,16 +476,17 @@ function ActionSendCard({
     ];
 
     const ResponsActionsSelecOptions = [
+        { label: "success", value: "success" },
         { label: "status", value: "status" },
         { label: "message", value: "message" },
         { label: "ref id", value: "ref_id" },
         { label: "campaign name", value: "campaign_name" },
         { label: "sender name", value: "sender_name" },
         { label: "limit", value: "limit" },
-        { label: "credit", value: "credit" },
+        { label: "credits", value: "credits" },
         { label: "total receiver", value: "total_receiver" },
         { label: "sent", value: "sent" },
-        { label: "success", value: "success" },
+        { label: "passed", value: "passed" },
         { label: "failed", value: "failed" },
         { label: "pending", value: "pending" },
         { label: "credits refund", value: "credits_refund" },

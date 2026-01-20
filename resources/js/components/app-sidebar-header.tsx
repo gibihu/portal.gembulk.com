@@ -23,7 +23,7 @@ export function AppSidebarHeader({
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
             <div className="flex items-center gap-2">
-                <span className='text-muted-foreground text-xs font-bold'>เครดิต: {user.credit.toLocaleString()}</span>
+                <span className='text-muted-foreground text-xs font-bold'>เครดิต: {user.credits.toLocaleString()}</span>
             </div>
         </header>
     );
