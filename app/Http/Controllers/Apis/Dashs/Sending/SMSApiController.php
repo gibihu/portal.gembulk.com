@@ -17,7 +17,7 @@ class SMSApiController extends Controller
     public function create(Request $request)
     {
         try{
-            $cp_name = $request->cp_name ?? '';
+            $cp_name = $request->campaign_name ?? '';
             $receivers = $request->receivers;
             $sender_id = $request->sender_id;
             $server_id = $request->server_id;
@@ -30,7 +30,7 @@ class SMSApiController extends Controller
 
 //            dd($request->all());
             $real_cost = $cost * $phone_counts;
-            if($user->credit >= $real_cost){
+            if($user->credits >= $real_cost){
 
                 $all_status = DB::transaction(function () use ($user, $cp_name, $receivers, $sender_id, $server_id, $cost, $real_cost, $msg, $phone_counts, $is_scheduled, $scheduled_at) {
                     $sender = Sender::find($sender_id);
@@ -81,7 +81,7 @@ class SMSApiController extends Controller
 
                 });
 
-                $user->credit = $user->credit - ($real_cost);
+                $user->credits = $user->credits - ($real_cost);
                 $user->save();
 
                 if(!empty($all_status['success'])){

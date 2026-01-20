@@ -17,6 +17,7 @@ import { toTimestamp } from "@/lib/timestamp";
 import { GetServerByUser } from "@/models/servers/get";
 import api from "@/routes/api";
 import web from "@/routes/web";
+import campaigns from "@/routes/web/dash/campaigns";
 import { BreadcrumbItem } from "@/types";
 import { PlanType, SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,6 +59,7 @@ export default function SmsAddPage(request: any) {
     now.setMinutes(now.getMinutes() + 5); // บวก 5 นาที
 
     const schema = z.object({
+        campaign_name: z.string().min(1, 'หรุณากรอกแคมเปญ'),
         sender: z.string().min(1, { message: "ห้ามว่าง" }),
         receivers: z.string().min(1, { message: "ห้ามว่าง" }),
         msg: z.string({ message: "กรุณากรอกข้อความ" }).min(0, { message: "ต้องมีข้อความอย่างน้อย 1 ตัวอักษร" }),
@@ -70,10 +72,11 @@ export default function SmsAddPage(request: any) {
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
+            campaign_name: '',
             sender: servers[0]?.senders?.[0]?.id,
             receivers: '',
             phone_counts: countReceivers,
-            is_scheduled: true,
+            is_scheduled: false,
             scheduled_date: new Date(),
             scheduled_time: now.toTimeString().slice(0, 5),
         },
@@ -106,6 +109,7 @@ export default function SmsAddPage(request: any) {
                         phone_counts: countReceivers,
                         is_scheduled: data.is_scheduled,
                         scheduled_at: toTimestamp(data.scheduled_date ?? '', data.scheduled_time),
+                        campaign_name: data.campaign_name,
                     })
                 });
 
@@ -194,6 +198,19 @@ export default function SmsAddPage(request: any) {
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="campaign_name"
+                            render={({ field, fieldState }) => (
+                                <FormItem>
+                                    <FormLabel>ชื่อเคมเปญ</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="โปรโมชั่น...." disabled={isFetch} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

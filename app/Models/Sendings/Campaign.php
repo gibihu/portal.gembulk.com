@@ -43,7 +43,9 @@ class Campaign extends Model
         'data' => 'array',
         'receivers' => 'array',
         'response' => 'array',
+        'response_callback' => 'array',
         'response_report' => 'array',
+        'response_report_callback' => 'array',
     ];
 
     protected $appends = [
@@ -69,4 +71,11 @@ class Campaign extends Model
     {
         return $this->hasMany(CampaignReceiver::class, 'campaign_id');
     }
+
+    public function scopeHasPendingReport($q)
+    {
+        return $q->whereNotNull('response_report_callback->pending')
+            ->where('response_report_callback->pending', '>', 1);
+    }
+
 }

@@ -34,7 +34,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ReportType } from "@/types/user";
+import { CampaignType } from "@/types/user";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import web from "@/routes/web";
@@ -49,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
-export const columns: ColumnDef<ReportType>[] = [
+export const columns: ColumnDef<CampaignType>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -83,7 +83,7 @@ export const columns: ColumnDef<ReportType>[] = [
         accessorKey: "sender",
         header: "รหัสผู้ส่ง",
         cell: ({ row }) => {
-            const amount = row.original.sender.name;
+            const amount = row.original.sender?.name;
 
             return amount;
         },
@@ -180,8 +180,8 @@ export default function ReportTable({ items }: { items: any }) {
     })
 
     return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
+        <div className="w-full flex flex-col gap-4">
+            <div className="flex items-center">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
@@ -210,7 +210,7 @@ export default function ReportTable({ items }: { items: any }) {
                 </DropdownMenu>
             </div>
             <div className="overflow-hidden rounded-md border">
-                <Table>
+                <Table className="bg-background">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
