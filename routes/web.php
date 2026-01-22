@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Pages\Auth\LoginController;
+use App\Http\Controllers\Pages\Auth\AuthController;
 use App\Http\Controllers\Pages\Dashs\WebDashAdminPageController;
 use App\Http\Controllers\Pages\Dashs\WebDashPageController;
 use App\Http\Controllers\Pages\WebPageController;
@@ -10,8 +10,13 @@ use Inertia\Inertia;
 
 Route::name('web.')->group(function () {
 
-    Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
-        Route::post('', 'store')->name('store');
+    Route::controller(AuthController::class)->group(function () {
+        Route::prefix('login')->name('login.')->group(function () {
+            Route::post('/', 'store')->name('store');
+        });
+//        Route::prefix('register')->name('register.')->group(function () {
+//            Route::post('/', 'RegisterStore')->name('store');
+//        });
     });
 
     Route::middleware(['auth'])->group(function () {
@@ -25,8 +30,6 @@ Route::name('web.')->group(function () {
                 Route::prefix('senders')->name('senders.')->group(function () {
                     Route::get('add', 'senderAdd')->name('add');
                 });
-
-
                 Route::prefix('sending')->name('sending.')->group(function () {
                     Route::prefix('sms')->name('sms.')->group(function () {
                         Route::get('add', 'smsAdd')->name('add');
@@ -43,6 +46,9 @@ Route::name('web.')->group(function () {
                 });
                 Route::prefix('campaigns')->name('campaigns.')->group(function () {
                     Route::get('reports', 'reportCampaigns')->name('reports');
+                });
+                Route::prefix('otp')->name('otp.')->group(function () {
+                    Route::get('template', 'templateOTP')->name('template');
                 });
             });
 

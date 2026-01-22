@@ -50,9 +50,9 @@ export default function AddServerPage(request: any) {
             key: z.string(),
             endpoint: z.string().optional().nullable(),
             method: z.string().optional().nullable(),
-            headers: z.array(z.record(z.string(), z.any())).optional(),
+            headers: z.record(z.string(), z.any()).optional(),
             body: z.array(z.record(z.string(), z.any())).optional(),
-            response: z.array(z.record(z.string(), z.any())).optional(),
+            response: z.record(z.string(), z.any()).optional(),
         })).optional(),
     });
     type FormValues = z.infer<typeof server_info_schema>;
@@ -66,72 +66,74 @@ export default function AddServerPage(request: any) {
                 key: 'sms',
                 endpoint: smsAction?.endpoint ?? '',
                 method: smsAction?.method ?? 'POST',
-                headers: smsAction?.headers ?? [{ "Content-Type": "application/json" }],
+                headers: smsAction?.headers ?? { "Content-Type": "application/json", "": "" },
                 body: smsAction?.body ?? [
                     { "message": "message" },
                     { "sender": "" },
-                    { "receiver": "" },
+                    { "receivers": "" },
                     { "scheduled_at": "false" }
                 ],
-                response: smsAction?.response ?? [
-                    { "status": "success" },
-                    { "message": "message" },
-                    { "ref_id": "campaign_id" }
-                ],
+                response: smsAction?.response ?? {
+                    "status": "success",
+                    "message": "message",
+                    "ref_id": "campaign_id"
+                },
             },
             {
                 key: 'sms_report',
                 endpoint: smsReportAction?.endpoint ?? '',
                 method: smsReportAction?.method ?? 'POST',
-                headers: smsReportAction?.headers ?? [{ "Content-Type": "application/json" }],
+                headers: smsReportAction?.headers ?? { "Content-Type": "application/json", "": "" },
                 body: smsReportAction?.body ?? [
                     { "message": "message" },
                     { "sender": "" },
-                    { "receiver": "" },
+                    { "receivers": "" },
                     { "scheduled_at": "false" }
                 ],
-                response: smsReportAction?.response ?? [
-                    { "status": "success" },
-                    { "message": "message" },
-                    { "ref_id": "campaign_id" }
-                ],
+                response: smsReportAction?.response ?? {
+                    "status": "success",
+                    "message": "message",
+                    "ref_id": "campaign_id"
+                },
             },
             {
                 key: 'otp',
                 endpoint: otpAction?.endpoint ?? '',
                 method: otpAction?.method ?? 'POST',
-                headers: otpAction?.headers ?? [{ "Content-Type": "application/json" }],
+                headers: otpAction?.headers ?? { "Content-Type": "application/json", "": "" },
                 body: otpAction?.body ?? [
                     { "message": "message" },
                     { "sender": "" },
-                    { "receiver": "" },
+                    { "receivers": "" },
                     { "scheduled_at": "false" }
                 ],
-                response: otpAction?.response ?? [
-                    { "status": "success" },
-                    { "message": "message" },
-                    { "ref_id": "campaign_id" }
-                ],
+                response: otpAction?.response ?? {
+                    "status": "success",
+                    "message": "message",
+                    "ref_id": "campaign_id"
+                },
             },
             {
                 key: 'otp_report',
                 endpoint: otpReportAction?.endpoint ?? '',
                 method: otpReportAction?.method ?? 'POST',
-                headers: otpReportAction?.headers ?? [{ "Content-Type": "application/json" }],
+                headers: otpReportAction?.headers ?? { "Content-Type": "application/json", "": ""},
                 body: otpReportAction?.body ?? [
                     { "message": "message" },
                     { "sender": "" },
-                    { "receiver": "" },
+                    { "receivers": "" },
                     { "scheduled_at": "false" }
                 ],
-                response: otpReportAction?.response ?? [
-                    { "status": "success" },
-                    { "message": "message" },
-                    { "ref_id": "campaign_id" }
-                ],
+                response: otpReportAction?.response ?? {
+                    "status": "success",
+                    "message": "message",
+                    "ref_id": "campaign_id"
+                },
             }
         ],
     };
+
+    console.log('defaultValues', defaultValues);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(server_info_schema),
@@ -149,24 +151,9 @@ export default function AddServerPage(request: any) {
     const otpActionIndex = 2;
     const otpReportActionIndex = 3;
 
-    const smsHeadersFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${smsActionIndex}.headers`,
-    });
-
     const smsBodyFieldArray = useFieldArray({
         control: form.control,
         name: `actions.${smsActionIndex}.body`,
-    });
-
-    const smsResponseFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${smsActionIndex}.response`,
-    });
-
-    const otpHeadersFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${otpActionIndex}.headers`,
     });
 
     const otpBodyFieldArray = useFieldArray({
@@ -174,35 +161,14 @@ export default function AddServerPage(request: any) {
         name: `actions.${otpActionIndex}.body`,
     });
 
-    const otpResponseFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${otpActionIndex}.response`,
-    });
-
-    const smsReportHeadersFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${smsReportActionIndex}.headers`,
-    });
     const smsReportBodyFieldArray = useFieldArray({
         control: form.control,
         name: `actions.${smsReportActionIndex}.body`,
     });
-    const smsReportResponseFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${smsReportActionIndex}.response`,
-    });
 
-    const otpReportHeadersFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${otpReportActionIndex}.headers`,
-    });
     const otpReportBodyFieldArray = useFieldArray({
         control: form.control,
         name: `actions.${otpReportActionIndex}.body`,
-    });
-    const otpReportResponseFieldArray = useFieldArray({
-        control: form.control,
-        name: `actions.${otpReportActionIndex}.response`,
     });
 
     function submit(formData: FormValues) {
@@ -341,9 +307,7 @@ export default function AddServerPage(request: any) {
                                                     description="การส่งข้อความไปยังเซิร์ฟเวอร์"
                                                     form={form}
                                                     actionIndex={smsActionIndex}
-                                                    HeadersFieldArray={smsHeadersFieldArray}
                                                     BodyFieldArray={smsBodyFieldArray}
-                                                    ResponseFieldArray={smsResponseFieldArray}
                                                     isFetch={isFetch}
                                                     action="sms"
                                                 />
@@ -352,9 +316,7 @@ export default function AddServerPage(request: any) {
                                                     description="การตรวจสอบการส่ง"
                                                     form={form}
                                                     actionIndex={smsReportActionIndex}
-                                                    HeadersFieldArray={smsReportHeadersFieldArray}
                                                     BodyFieldArray={smsReportBodyFieldArray}
-                                                    ResponseFieldArray={smsReportResponseFieldArray}
                                                     isFetch={isFetch}
                                                     action="sms_report"
                                                 />
@@ -425,9 +387,7 @@ interface ActionSendCardProps {
     description: string;
     form: any;
     actionIndex: number;
-    HeadersFieldArray: any;
     BodyFieldArray: any;
-    ResponseFieldArray: any;
     isFetch: boolean;
     action?: string;
 }
@@ -437,9 +397,7 @@ function ActionSendCard({
     description,
     form,
     actionIndex,
-    HeadersFieldArray,
     BodyFieldArray,
-    ResponseFieldArray,
     isFetch,
     action = 'sms',
 }: ActionSendCardProps) {
@@ -553,108 +511,101 @@ function ActionSendCard({
 
                             {/* Headers Section */}
                             <div className="mt-4">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="font-bold text-lg">Headers</span>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        onClick={() => HeadersFieldArray.append({ "": "" })}
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </Button>
+                                <span className="font-bold text-lg">Headers</span>
+                                
+                                <div className="mt-4 grid grid-cols-12 gap-4">
+                                    <span className="col-span-2 font-semibold text-sm">ค่าที่ระบบรองรับ</span>
+                                    <span className="col-span-10 font-semibold text-sm">ค่าต้องรับ</span>
                                 </div>
 
-                                {HeadersFieldArray.fields.length > 0 && (
-                                    <div className="grid grid-cols-12 gap-4 mb-4">
-                                        <span className="col-span-2 font-semibold text-sm">ค่าที่ระบบรองรับ</span>
-                                        <span className="col-span-9 font-semibold text-sm">ค่าต้องรับ</span>
-                                    </div>
-                                )}
-
-                                {HeadersFieldArray.fields.map((field: any, index: number) => (
-                                    <div key={field.id} className="grid grid-cols-12 gap-4 mb-4">
-                                        <FormField
-                                            control={form.control}
-                                            name={`actions.${actionIndex}.headers.${index}`}
-                                            render={({ field: fieldObj }: any) => {
-                                                const headerKeys = Object.keys(fieldObj.value || {});
-                                                const currentKey = headerKeys[0] || '';
-                                                return (
-                                                    <FormItem className="col-span-2 flex flex-col items-start">
-                                                        <Select
-                                                            onValueChange={(newKey) => {
-                                                                const oldValue = fieldObj.value[currentKey];
-                                                                const newValue = { [newKey]: oldValue };
-                                                                fieldObj.onChange(newValue);
-                                                            }}
-                                                            value={currentKey}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="เลือก Header" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {HeaderActionsSelectOptions.map((option, idx) => (
-                                                                    <SelectItem key={`header-${idx}`} value={option.value}>
-                                                                        {option.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            }}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name={`actions.${actionIndex}.headers.${index}`}
-                                            render={({ field: fieldObj }: any) => {
-                                                const headerKeys = Object.keys(fieldObj.value || {});
-                                                const currentKey = headerKeys[0] || '';
-                                                return (
-                                                    <FormItem className="col-span-9 flex flex-col items-start">
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="ค่า Header"
-                                                                value={fieldObj.value?.[currentKey] || ''}
-                                                                onChange={(e) => {
-                                                                    fieldObj.onChange({ [currentKey]: e.target.value });
+                                <FormField
+                                    control={form.control}
+                                    name={`actions.${actionIndex}.headers`}
+                                    render={({ field }: any) => {
+                                        const headers = field.value || {};
+                                        const entries = Object.entries(headers) as [string, string][];
+                                        
+                                        return (
+                                            <div className="mt-4 space-y-4">
+                                                {entries.map(([key, value], idx) => (
+                                                    <div key={idx} className="grid grid-cols-12 gap-4">
+                                                        <FormItem className="col-span-2 flex flex-col items-start">
+                                                            <Select
+                                                                value={key}
+                                                                onValueChange={(newKey) => {
+                                                                    const newHeaders = { ...headers };
+                                                                    delete newHeaders[key];
+                                                                    newHeaders[newKey] = value;
+                                                                    field.onChange(newHeaders);
                                                                 }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            }}
-                                        />
+                                                            >
+                                                                <FormControl>
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="เลือก Header" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {HeaderActionsSelectOptions.map((option, optIdx) => (
+                                                                        <SelectItem key={`header-${optIdx}`} value={option.value}>
+                                                                            {option.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
 
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="destructive"
-                                            className="h-11"
-                                            onClick={() => HeadersFieldArray.remove(index)}
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                ))}
+                                                        <FormItem className="col-span-9 flex flex-col items-start">
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="ค่า Header"
+                                                                    value={value}
+                                                                    onChange={(e) => {
+                                                                        const newHeaders = { ...headers, [key]: e.target.value };
+                                                                        field.onChange(newHeaders);
+                                                                    }}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-11 col-span-1"
+                                                            onClick={() => {
+                                                                const newHeaders = { ...headers };
+                                                                delete newHeaders[key];
+                                                                field.onChange(newHeaders);
+                                                            }}
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                                
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    className="mt-2"
+                                                    onClick={() => {
+                                                        field.onChange({ ...headers, "": "" });
+                                                    }}
+                                                >
+                                                    <Plus className="w-4 h-4 mr-2" />
+                                                    เพิ่ม Header
+                                                </Button>
+                                            </div>
+                                        );
+                                    }}
+                                />
                             </div>
 
                             {/* Body Section */}
                             <div className="mt-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="font-bold text-lg">Body</span>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        onClick={() => BodyFieldArray.append({ "": "" })}
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </Button>
                                 </div>
 
                                 {BodyFieldArray.fields.length > 0 && (
@@ -752,96 +703,106 @@ function ActionSendCard({
                                         </Button>
                                     </div>
                                 ))}
-                            </div>
-
-                            <div className="mt-4">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="font-bold text-lg">Response</span>
                                     <Button
                                         type="button"
                                         size="sm"
-                                        onClick={() => ResponseFieldArray.append({ "": "" })}
+                                        onClick={() => BodyFieldArray.append({ "": "" })}
                                     >
-                                        <Plus className="w-4 h-4" />
+                                        <Plus className="w-4 h-4" /> 
+                                        เพิ่ม Body
                                     </Button>
+                            </div>
+
+                            <div className="mt-4">
+                                <span className="font-bold text-lg">Response</span>
+                                
+                                <div className="mt-4 grid grid-cols-12 gap-4">
+                                    <span className="col-span-2 font-semibold text-sm">ค่าที่ระบบรองรับ</span>
+                                    <span className="col-span-10 font-semibold text-sm">ค่าต้องรับ</span>
                                 </div>
 
-                                {ResponseFieldArray.fields.length > 0 && (
-                                    <div className="grid grid-cols-12 gap-4 mb-4">
-                                        <span className="col-span-2 font-semibold text-sm">ค่าที่ระบบรองรับ</span>
-                                        <span className="col-span-9 font-semibold text-sm">ค่าต้องรับ</span>
-                                    </div>
-                                )}
-
-                                {ResponseFieldArray.fields.map((field: any, index: number) => (
-                                    <div key={field.id} className="grid grid-cols-12 gap-4 mb-4">
-                                        <FormField
-                                            control={form.control}
-                                            name={`actions.${actionIndex}.response.${index}`}
-                                            render={({ field: fieldObj }: any) => {
-                                                const respKey = Object.keys(fieldObj.value || {})[0] || '';
-                                                return (
-                                                    <FormItem className="col-span-2 flex flex-col items-start">
-                                                        <Select
-                                                            onValueChange={(newKey) => {
-                                                                const oldValue = fieldObj.value[respKey];
-                                                                const newValue = { [newKey]: oldValue };
-                                                                fieldObj.onChange(newValue);
-                                                            }}
-                                                            value={respKey}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="เลือก Response" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {ResponsActionsSelecOptions.map((option) => (
-                                                                    <SelectItem key={option.value} value={option.value}>
-                                                                        {option.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            }}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name={`actions.${actionIndex}.response.${index}`}
-                                            render={({ field: fieldObj }: any) => {
-                                                const respKey = Object.keys(fieldObj.value || {})[0] || '';
-                                                return (
-                                                    <FormItem className="col-span-9 flex flex-col items-start">
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="ชื่อ parameter ที่จะรับ"
-                                                                value={fieldObj.value?.[respKey] || ''}
-                                                                onChange={(e) => {
-                                                                    fieldObj.onChange({ [respKey]: e.target.value });
+                                <FormField
+                                    control={form.control}
+                                    name={`actions.${actionIndex}.response`}
+                                    render={({ field }: any) => {
+                                        const response = field.value || {};
+                                        const entries = Object.entries(response) as [string, string][];
+                                        
+                                        return (
+                                            <div className="mt-4 space-y-4">
+                                                {entries.map(([key, value], idx) => (
+                                                    <div key={idx} className="grid grid-cols-12 gap-4">
+                                                        <FormItem className="col-span-2 flex flex-col items-start">
+                                                            <Select
+                                                                value={key}
+                                                                onValueChange={(newKey) => {
+                                                                    const newResponse = { ...response };
+                                                                    delete newResponse[key];
+                                                                    newResponse[newKey] = value;
+                                                                    field.onChange(newResponse);
                                                                 }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                );
-                                            }}
-                                        />
+                                                            >
+                                                                <FormControl>
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="เลือก Response" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {ResponsActionsSelecOptions.map((option) => (
+                                                                        <SelectItem key={option.value} value={option.value}>
+                                                                            {option.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
 
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="destructive"
-                                            className="h-11"
-                                            onClick={() => ResponseFieldArray.remove(index)}
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                ))}
+                                                        <FormItem className="col-span-9 flex flex-col items-start">
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="ชื่อ parameter ที่จะรับ"
+                                                                    value={value}
+                                                                    onChange={(e) => {
+                                                                        const newResponse = { ...response, [key]: e.target.value };
+                                                                        field.onChange(newResponse);
+                                                                    }}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-11 col-span-1"
+                                                            onClick={() => {
+                                                                const newResponse = { ...response };
+                                                                delete newResponse[key];
+                                                                field.onChange(newResponse);
+                                                            }}
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                                
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    className="mt-2"
+                                                    onClick={() => {
+                                                        field.onChange({ ...response, "": "" });
+                                                    }}
+                                                >
+                                                    <Plus className="w-4 h-4 mr-2" />
+                                                    เพิ่ม Response
+                                                </Button>
+                                            </div>
+                                        );
+                                    }}
+                                />
                             </div>
 
                         </AccordionContent>

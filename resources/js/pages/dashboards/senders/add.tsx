@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AppLayout from "@/layouts/app-layout";
 import { extractDomain } from "@/lib/url-functions";
 import { GetServerByUser } from "@/models/servers/get";
@@ -273,28 +274,38 @@ export default function AddSenderPage(request: any) {
                             <CardHeader className="font-bold">
                                 เซิฟเวอร์ {server.name}
                             </CardHeader>
-                            <CardContent className="px-12">
-                                <ul className="list-disc">
-                                    {server.senders?.map((sender: SenderType, sender_index: number) => (
-                                        <li key={sender.id}>
-                                            <div className="flex justify-between items-center">
-                                                <span>
-                                                    <span>{sender.name} </span>
-                                                    <span className="text-muted-foreground">{sender.user_id == null && "(ฟรี)"}</span>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Sender</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Used</TableHead>
+                                            <TableHead>Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {server.senders?.map((sender: SenderType, sender_index: number) => (
+                                            <TableRow key={sender_index}>
+                                                <TableCell>{sender.name}</TableCell>
+                                                <TableCell>
+                                                    <span className="text-muted-foreground">{sender.user_id == null && "ฟรี"}</span>
+                                                </TableCell>
+                                                <TableCell>
                                                     {
-                                                        sender.status_text == "pending" ? <span className="text-amber-500">(รออนุมัติ)</span>
+                                                        sender.status_text == "pending" ? <span className="text-amber-500">รออนุมัติ</span>
                                                             :
-                                                            sender.status_text == "completed" ? <span className="text-green-300">(อนุมัติแล้ว)</span>
+                                                            sender.status_text == "completed" ? <span className="text-green-300">อนุมัติแล้ว</span>
                                                                 :
-                                                                sender.status_text == "active" ? <span className="text-green-500">(ใช้งาน)</span>
+                                                                sender.status_text == "active" ? <span className="text-green-500">ใช้งาน</span>
                                                                     :
-                                                                    sender.status_text == "inactive" ? <span className="text-muted-foreground">(ไม่ใช้งาน)</span>
+                                                                    sender.status_text == "inactive" ? <span className="text-muted-foreground">ไม่ใช้งาน</span>
                                                                         :
-                                                                        sender.status_text == "rejected" ? <span className="text-danger">(ปฏิเสธ)</span>
+                                                                        sender.status_text == "rejected" ? <span className="text-danger">ปฏิเสธ</span>
                                                                             : null
                                                     }
-                                                </span>
-                                                <div className="flex gap-1">
+                                                </TableCell>
+                                                <TableCell>
                                                     {
                                                         sender.status_text == "completed" || sender.status_text == "inactive" ?
                                                             <Button variant="ghost" className="hover:bg-success hover:text-success-foreground"
@@ -317,11 +328,11 @@ export default function AddSenderPage(request: any) {
                                                             <Trash />
                                                         </Button>
                                                     )}
-                                                </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </CardContent>
                         </>
                     ))}

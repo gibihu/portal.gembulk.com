@@ -54,51 +54,24 @@ export function AppSidebar() {
                     href: web.dash.senders.add().url,
                     icon: Ticket,
                     isActive: false,
-                    items: [
-                        {
-                            title: "Add",
-                            href: web.dash.senders.add().url,
-                        },
-                    ],
                 },
                 {
                     title: "SMS",
                     href: web.dash.sending.sms.add().url,
                     icon: Notebook,
                     isActive: false,
-                    items: [],
                 },
-                // {
-                //     title: "Sending",
-                //     href: web.dash.sending.sms().url,
-                //     icon: Send,
-                //     isActive: false,
-                //     items: [
-                //         {
-                //             title: "SMS",
-                //             href: web.dash.sending.sms().url,
-                //         },
-                //         {
-                //             title: "OTP",
-                //             href: web.dash.sending.otp().url,
-                //         },
-                //     ],
-                // },
+                {
+                    title: "OTP Template",
+                    href: web.dash.otp.template.url(),
+                    icon: Notebook,
+                    isActive: false,
+                },
                 {
                     title: "Jobs",
                     href: web.dash.jobs.sms().url,
                     icon: Bot,
                     isActive: false,
-                    items: [
-                        {
-                            title: "SMS",
-                            href: web.dash.jobs.sms().url,
-                        },
-                        {
-                            title: "OTP",
-                            href: web.dash.jobs.otp().url,
-                        },
-                    ],
                 },
                 {
                     title: "Reports",
@@ -118,12 +91,6 @@ export function AppSidebar() {
                             href: web.dash.admin.server.lists().url,
                             icon: Server,
                             isActive: false,
-                            items: [
-                                {
-                                    title: "List",
-                                    href: web.dash.admin.server.lists().url,
-                                },
-                            ],
                         },
                         {
                             title: "อนุมัติผู้ส่ง",

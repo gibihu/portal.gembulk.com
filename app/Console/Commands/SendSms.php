@@ -41,6 +41,13 @@ class SendSms extends Command
 
         try {
             $limit = 50;
+            $count = Campaign::where('status', Campaign::STATUS_PENDING)
+                ->limit($limit)
+                ->count();
+            Log::channel('sms_sent')->info('--> Found ' . $count . ' pending campaigns' . ' Limit ' . $limit);
+            if ($count === 0) {
+                return;
+            }
 
             Campaign::where('status', Campaign::STATUS_PENDING)
                 ->limit($limit)
@@ -63,26 +70,40 @@ class SendSms extends Command
 //                            Log::channel('sms_sent')->info('--> Skip: Not time yet');
                             return; // ⛔ ยังไม่ถึงเวลา ข้าม
                         }
-
                         Log::channel('sms_sent')->info('--> Time reached, continue sending');
                     } else {
                         Log::channel('sms_sent')->info('--> Server supports schedule, send immediately');
                     }
 
-                    // 4. เริ่มประมวลผล
-                    $item->status = Campaign::STATUS_PROCESSING;
-                    $item->save();
+                    $updated = Campaign::where('id', $item->id)
+                        ->where('status', Campaign::STATUS_PENDING)
+                        ->update([
+                            'status' => Campaign::STATUS_PROCESSING,
+                        ]);
 
-                    if ($item->action_key === 'sms') {
-                        Log::channel('sms_sent')->info('--> Action Is "' . $item->action_key . '"');
+                    if ($updated === 0) {
+                        return; // มีตัวอื่นแย่งไปแล้ว
+                    }
 
-                        $item = ActionServerHelper::ActionSMS($item);
+                    try {
+                        if ($item->action_key === 'sms') {
+                            Log::channel('sms_sent')->info('--> Action Is "sms"');
+                            $item = $item->fresh();
+                            $item = ActionServerHelper::ActionSMS($item);
+                            $item->save();
+                            Log::channel('sms_sent')->info('--> Action completed');
+                        }
+
+                    } catch (\Throwable $e) {
+
+                        // ===== 3. ถ้า error → mark FAILED =====
+                        Log::channel('sms_sent')->error('Campaign #' . $item->id . ' failed: ' . $e->getMessage());
+
+                        $item->status = Campaign::STATUS_FAILED;
                         $item->save();
-
-                        Log::channel('sms_sent')->info('--> Action completed');
                     }
                 }
-                );
+            );
         } catch (Throwable $e) {
             Log::channel('sms_sent')->error('--> Error: ' . $e->getMessage());
         }

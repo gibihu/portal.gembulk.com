@@ -55,4 +55,14 @@ class WebDashPageController extends Controller
 
         return Inertia::render('dashboards/senders/add', compact('sender'));
     }
+
+    public function templateOTP(Request $request)
+    {
+        $server_id = $request->user()->plan->servers[0];
+        $server = [
+            'id' => $server_id,
+        ];
+
+        return Inertia::render('dashboards/otp/templates/add', compact('server'));
+    }
 }

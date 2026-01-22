@@ -13,7 +13,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader, MoreHorizontal, Plus, SquarePen, Trash } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader, Plus, SquarePen, Trash } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -22,10 +22,7 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,11 +34,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ServerType } from "@/types/user";
-import { Link, router, usePage } from "@inertiajs/react";
-import web from "@/routes/web";
-import { toast } from "sonner";
 import api from "@/routes/api";
+import web from "@/routes/web";
+import { Link, router, usePage } from "@inertiajs/react";
+import { toast } from "sonner";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
