@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Pages\Auth\LoginController;
+use App\Http\Controllers\Pages\Auth\AuthController;
 use App\Http\Controllers\Pages\Dashs\WebDashAdminPageController;
 use App\Http\Controllers\Pages\Dashs\WebDashPageController;
 use App\Http\Controllers\Pages\WebPageController;
@@ -10,8 +10,13 @@ use Inertia\Inertia;
 
 Route::name('web.')->group(function () {
 
-    Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
-        Route::post('', 'store')->name('store');
+    Route::controller(AuthController::class)->group(function () {
+        Route::prefix('login')->name('login.')->group(function () {
+            Route::post('/', 'store')->name('store');
+        });
+//        Route::prefix('register')->name('register.')->group(function () {
+//            Route::post('/', 'RegisterStore')->name('store');
+//        });
     });
 
     Route::middleware(['auth'])->group(function () {

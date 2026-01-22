@@ -15,7 +15,7 @@ class WebDashPageController extends Controller
 {
     public function index()
     {
-        return Inertia::render('welcome');
+        return Inertia::render('dashboards/index');
     }
 
     public function smsAdd()

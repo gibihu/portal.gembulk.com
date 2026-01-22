@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Mockery\Exception;
 
-class LoginController extends Controller
+class AuthController extends Controller
 {
     public function store(Request $request)
     {

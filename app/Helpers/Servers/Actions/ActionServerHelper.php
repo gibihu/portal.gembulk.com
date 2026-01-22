@@ -75,8 +75,12 @@ class ActionServerHelper
                 $item->user->credits += $item->response_callback['credits_refund'] ?? 0;
                 $item->user->save();
                 $item->sent_at = $now->format('Y-m-d H:i:s');
-                if($item->response_report_callback['pending'] == 0){
-                    $item->status = Campaign::STATUS_COMPLETED;
+                if (($item->response_callback['status'] ?? null) !== 200 || ($item->response_callback['status'] ?? null) !== 201) {
+                    $item->status = Campaign::STATUS_FAILED;
+                }else{
+                    if($item->response_report_callback['pending'] == 0){
+                        $item->status = Campaign::STATUS_COMPLETED;
+                    }
                 }
                 $item->receiver_s->each(function ($i) use ($item) {
                     $i->status = $item->status;
