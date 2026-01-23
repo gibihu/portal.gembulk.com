@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Pages\Dashs;
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\CampaignReceiver;
 use App\Models\Sendings\Campaign;
+use App\Models\Sendings\Plan;
 use App\Models\Sendings\Servers\Server;
 use App\Models\Sendings\SpamWord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use PhpParser\Node\Stmt\Return_;
 
 class WebDashPageController extends Controller
 {
@@ -64,5 +66,16 @@ class WebDashPageController extends Controller
         ];
 
         return Inertia::render('dashboards/otp/templates/add', compact('server'));
+    }
+
+    public function plansIndex()
+    {
+        return Inertia::render('dashboards/plans/index');
+    }
+
+    public function plansPayment(Request $request, $id)
+    {
+        $plan = Plan::find($id);
+        return Inertia::render('dashboards/plans/payment', compact('plan'));
     }
 }

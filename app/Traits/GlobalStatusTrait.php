@@ -35,12 +35,20 @@ trait GlobalStatusTrait
     const STATUS_ARCHIVED     = 30; // เก็บถาวร
     const STATUS_DELETED      = 31; // ลบแล้ว (soft delete)
 
-    // | ช่วง  | หมวด        |
-    // | ----- | ----------- |
-    // | 0–9   | lifecycle   |
-    // | 10–19 | usage       |
-    // | 20–29 | moderation  |
-    // | 30–39 | end of life |
+    // ─────────────────────────
+    // Distribution / Publishing
+    // ─────────────────────────
+    const STATUS_PUBLISHED    = 40; // เผยแผร่แล้ว
+    const STATUS_PRIVATE  = 41; // ยังไม่เผยแผร่
+    const STATUS_SCHEDULED    = 42; // กำหนดเผยแผร่
+
+    // | ช่วง  | หมวด           |
+    // | ----- | -------------- |
+    // | 0–9   | lifecycle      |
+    // | 10–19 | usage          |
+    // | 20–29 | moderation     |
+    // | 30–39 | end of life    |
+    // | 40–49 | distribution   |
 
     // ─────────────────────────
     // Labels (ใช้กับ UI / API)
@@ -64,6 +72,10 @@ trait GlobalStatusTrait
 
         self::STATUS_ARCHIVED     => 'archived',
         self::STATUS_DELETED      => 'deleted',
+
+        self::STATUS_PUBLISHED    => 'published',
+        self::STATUS_PRIVATE      => 'private',
+        self::STATUS_SCHEDULED    => 'scheduled',
     ];
 
     // ─────────────────────────
@@ -88,6 +100,10 @@ trait GlobalStatusTrait
 
         'archived'     => self::STATUS_ARCHIVED,
         'deleted'      => self::STATUS_DELETED,
+
+        'published'    => self::STATUS_PUBLISHED,
+        'private'      => self::STATUS_PRIVATE,
+        'scheduled'    => self::STATUS_SCHEDULED,
     ];
 
     // ─────────────────────────

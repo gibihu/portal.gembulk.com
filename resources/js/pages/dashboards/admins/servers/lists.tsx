@@ -7,7 +7,7 @@ import web from "@/routes/web";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Servers',
-        href: web.dash.admin.server.lists().url,
+        href: web.dashboard.admins.server.lists().url,
     },
 ];
 

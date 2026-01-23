@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apis\Admin\Servers;
+namespace App\Http\Controllers\Apis\Admins\Servers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\Servers\Server;
@@ -11,6 +11,39 @@ use Throwable;
 
 class ServerAdminApiController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        try {
+            $servers = Server::when($request->select, function ($query, $select) {
+                $columns = is_array($select)
+                    ? $select
+                    : explode(',', $select);
+
+                $allowed = ['id','name','status'];
+
+                $columns = array_intersect($columns, $allowed);
+
+                return $query->select($columns);
+            })->get();
+            return response()->json([
+                'message' => 'Success',
+                'data' => $servers,
+                'code' => 200
+            ], 200);
+        } catch (Throwable $e) {
+            $response = [
+                'message' => 'ไม่สามารถบันทึกข้อมูลได้ในขณะนี้',
+                'description' => 'เกิดข้อผิดพลาดระหว่างการบันทึกข้อมูล',
+                'code' => 500,
+            ];
+            if (config('app.debug')) $response['debug'] = [
+                'message' => $e->getMessage() ?? '',
+                'request' => $request->all(),
+            ];
+            return response()->json($response, 500);
+        }
+    }
     public function store(Request $request)
     {
         try {

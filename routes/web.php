@@ -24,7 +24,7 @@ Route::name('web.')->group(function () {
             Route::get('/', 'index')->name('home');
         });
 
-        Route::prefix('dashboard')->name('dash.')->group(function () {
+        Route::prefix('dashboard')->name('dashboard.')->group(function () {
             Route::controller(WebDashPageController::class)->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::prefix('senders')->name('senders.')->group(function () {
@@ -50,9 +50,13 @@ Route::name('web.')->group(function () {
                 Route::prefix('otp')->name('otp.')->group(function () {
                     Route::get('template', 'templateOTP')->name('template');
                 });
+                Route::prefix('plans')->name('plans.')->group(function () {
+                    Route::get('/', 'plansIndex')->name('index');
+                    Route::get('/{id}', 'plansPayment')->name('payment');
+                });
             });
 
-            Route::controller(WebDashAdminPageController::class)->prefix('admin')->name('admin.')->group(function () {
+            Route::controller(WebDashAdminPageController::class)->prefix('admins')->name('admins.')->group(function () {
                 Route::prefix('senders')->name('senders.')->group(function () {
                     Route::get('requests', 'senderRequests')->name('requests');
                 });
@@ -63,6 +67,12 @@ Route::name('web.')->group(function () {
                         Route::get('{id}', 'serverStoreEdit')->name('edit');
                     });
                     Route::get('lists', 'serverLists')->name('lists');
+                });
+
+                Route::prefix('plans')->name('plans.')->group(function () {
+                    Route::get('/', 'plansIndex')->name('index');
+                    Route::get('add', 'plansAdd')->name('add');
+                    Route::get('edit/{id}', 'plansEdit')->name('edit'); 
                 });
             });
         });
@@ -81,4 +91,5 @@ Route::controller(CronjobTestController::class)->prefix('test')->name('test.')->
 });
 
 require __DIR__.'/settings.php';
+require __DIR__.'/apis/index.php';
 require __DIR__.'/apis/auth.php';

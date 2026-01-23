@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apis\Admin\Sender;
+namespace App\Http\Controllers\Apis\Admins\Sender;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\Sender;

@@ -25,7 +25,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Add Sender',
-        href: web.dash.senders.add().url,
+        href: web.dashboard.senders.add().url,
     },
 ];
 

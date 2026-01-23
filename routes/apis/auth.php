@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Apis\Admin\Sender\SenderAdminApiController;
-use App\Http\Controllers\Apis\Admin\Servers\ServerAdminApiController;
+use App\Http\Controllers\Apis\Admins\Plans\PlanAdminApiController;
+use App\Http\Controllers\Apis\Admins\Sender\SenderAdminApiController;
+use App\Http\Controllers\Apis\Admins\Servers\ServerAdminApiController;
 use App\Http\Controllers\Apis\Dashs\Sending\SMSApiController;
 use App\Http\Controllers\Apis\Plans\PlansApiController;
 use App\Http\Controllers\Apis\Senders\SenderApiController;
@@ -42,8 +43,13 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
         });
 
         Route::controller(ServerAdminApiController::class)->prefix('servers')->name('servers.')->group(function () {
+            Route::get('/', 'index')->name('index');
             Route::post('/store', 'store')->name('store');
             Route::delete('/destroy', 'destroy')->name('destroy');
+        });
+
+        Route::controller(PlanAdminApiController::class)->prefix('plans')->name('plans.')->group(function () {
+            Route::get('/', 'index')->name('index');
         });
     });
 });

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: web.dash.jobs.sms().url,
+        href: web.dashboard.jobs.sms().url,
     },
 ];
 
@@ -22,14 +22,14 @@ export default function SmsRunJobPage(request: any) {
     const [rawItems, setRawItems] = useState<CampaignType[]>([]);
     const [items, setItems] = useState<CampaignType[]>([]);
     const [isFetch, setIsFetch] = useState<boolean>(false);
-    const [isLoad, setIsLoad] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     console.log(rawItems);
 
 
     useEffect(() => {
         setRawItems(request.jobs as CampaignType[]);
-        setIsLoad(false);
+        setIsLoading(false);
     }, [request.jobs]);
 
 
@@ -128,7 +128,7 @@ export default function SmsRunJobPage(request: any) {
                     ))
                 ))) : (
                     <div className="w-full flex justify-center text-muted-foreground">
-                        {isLoad ? (
+                        {isLoading ? (
                             <LoaderCircle className="size-4 animate-spin" />
                         ) : (
                             <>ไม่มีรายการที่กำลังทำ</>

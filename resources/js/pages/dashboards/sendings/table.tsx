@@ -42,7 +42,7 @@ import web from "@/routes/web";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: web.dash.jobs.sms().url,
+        href: web.dashboard.jobs.sms().url,
     },
 ];
 

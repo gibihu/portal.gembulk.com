@@ -12,7 +12,7 @@ import { useState } from "react";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'รายงาน',
-        href: web.dash.campaigns.reports().url,
+        href: web.dashboard.campaigns.reports().url,
     },
 ];
 

@@ -15,7 +15,7 @@ import { toast } from "sonner";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Sender Requests',
-        href: web.dash.admin.senders.requests().url,
+        href: web.dashboard.admins.senders.requests().url,
     },
 ];
 

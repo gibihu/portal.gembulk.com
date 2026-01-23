@@ -17,9 +17,8 @@ import { toTimestamp } from "@/lib/timestamp";
 import { GetServerByUser } from "@/models/servers/get";
 import api from "@/routes/api";
 import web from "@/routes/web";
-import campaigns from "@/routes/web/dash/campaigns";
 import { BreadcrumbItem } from "@/types";
-import { PlanType, SenderType, ServerType, UserType } from "@/types/user";
+import { SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head, router, usePage } from "@inertiajs/react";
 import { addYears } from "date-fns";
@@ -32,7 +31,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่ง sms',
-        href: web.dash.sending.sms.add().url,
+        href: web.dashboard.sending.sms.add().url,
     },
 ];
 export default function SmsAddPage(request: any) {
@@ -118,7 +117,7 @@ export default function SmsAddPage(request: any) {
                     toast.success(result.message);
                     router.reload();
                     form.reset();
-                    router.visit(web.dash.jobs.sms().url);
+                    router.visit(web.dashboard.jobs.sms().url);
                 } else {
                     toast.error(result.message, { description: result.description ?? '' });
                 }

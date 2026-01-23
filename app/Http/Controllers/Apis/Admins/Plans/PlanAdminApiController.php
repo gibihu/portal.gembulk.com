@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Apis\Plans;
+namespace App\Http\Controllers\Apis\Admins\Plans;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\Plan;
-use Exception;
 use Illuminate\Http\Request;
+use Throwable;
 
-class PlansApiController extends Controller
+class PlanAdminApiController extends Controller
 {
     public function index(Request $request)
     {
         try{
-            $plans = Plan::where('public', true)->get();
+            $plans = Plan::all();
             return response()->json([
-                'message' => 'Success',
-                'plans' => $plans,
-                'code' => 200
+                'message' => 'success',
+                'data' => $plans,
+                'code' => 200,
             ], 200);
-        }catch (Exception $e) {
+        }catch (Throwable $e){
             $response = [
                 'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
                 'description' => $e->getMessage() ?? '',
                 'code' => 500,
             ];
-            if(config('app.debug')) $response['debug'] = [
+            if (config('app.debug')) $response['debug'] = [
                 'message' => $e->getMessage() ?? '',
                 'request' => $request->all(),
             ];

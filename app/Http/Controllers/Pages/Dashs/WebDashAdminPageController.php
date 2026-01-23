@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pages\Dashs;
 
 use App\Http\Controllers\Controller;
+use App\Models\Sendings\Plan;
 use App\Models\Sendings\Sender;
 use App\Models\Sendings\Servers\Server;
 use Illuminate\Http\Request;
@@ -43,9 +44,26 @@ class WebDashAdminPageController extends Controller
         return Inertia::render('dashboards/admins/servers/add', compact('server'));
     }
 
-    public function serverStoreEdit(Request $request, $id){
+    public function serverStoreEdit(Request $request, $id)
+    {
         $server = Server::with('actions')->find($id);
         return Inertia::render('dashboards/admins/servers/add', compact('server'));
+    }
+
+    public function plansIndex()
+    {
+        return Inertia::render('dashboards/admins/plans/list');
+    }
+
+    public function plansAdd()
+    {
+        return Inertia::render('dashboards/admins/plans/add');
+    }
+
+    public function plansEdit(Request $request, $id)
+    {
+        $plan = plan::find($id);
+        return Inertia::render('dashboards/admins/plans/add', compact('plan'));
     }
 
 }

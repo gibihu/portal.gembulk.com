@@ -24,7 +24,7 @@ import { ServerActionType, ServerType } from "@/types/user";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Add Server',
-        href: web.dash.admin.server.store.add().url,
+        href: web.dashboard.admins.server.store.add().url,
     },
 ];
 
@@ -188,7 +188,7 @@ export default function AddServerPage(request: any) {
                 if (res.ok) {
                     toast.success(result.message);
                     router.reload();
-                    router.visit(web.dash.admin.server.lists().url);
+                    router.visit(web.dashboard.admins.server.lists().url);
                 } else {
                     toast.error(result.message, { description: result.description ?? '' });
                 }

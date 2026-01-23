@@ -8,10 +8,11 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
+import web from '@/routes/web';
 import { type User } from '@/types';
 import { UserType } from '@/types/user';
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { LandPlot, LogOut, Settings } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: UserType;
@@ -44,6 +45,18 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     >
                         <Settings className="mr-2" />
                         Settings
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link
+                        className="block w-full"
+                        href={web.dashboard.plans.index()}
+                        as="button"
+                        prefetch
+                        onClick={cleanup}
+                    >
+                        <LandPlot className="mr-2" />
+                        Plans
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>

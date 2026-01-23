@@ -21,7 +21,7 @@ import { Code } from "@/components/custom_ui/code";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่งแล้ว',
-        href: web.dash.report.sms().url,
+        href: web.dashboard.report.sms().url,
     },
 ];
 
