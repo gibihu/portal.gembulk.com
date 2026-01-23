@@ -21,8 +21,6 @@ return new class extends Migration
             $table->string('password');
 
             $table->bigInteger('credits')->default(0);
-
-            $table->json('senders')->nullable(); // sender จะไม่ผูกกับ user แต่ user ก็สามารถมร sender เองได้
             $table->char('plan_id', 36)->nullable();
 
             $table->json('roles')->nullable();

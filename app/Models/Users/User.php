@@ -24,7 +24,6 @@ class User extends Authenticatable
         'email_verified_at',
         'password',
         'credits',
-        'senders',
         'plan_id',
         'roles',
         'avatar',
