@@ -72,15 +72,17 @@ class ActionServerHelper
             $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
             if($sent !== false){
                 [$item->response_report, $item->response_report_callback] = $sent;
-                $item->user->credits += $item->response_callback['credits_refund'] ?? 0;
-                $item->user->save();
                 $item->sent_at = $now->format('Y-m-d H:i:s');
-                if (($item->response_callback['status'] ?? null) !== 200 || ($item->response_callback['status'] ?? null) !== 201) {
-                    $item->status = Campaign::STATUS_FAILED;
-                }else{
-                    if($item->response_report_callback['pending'] == 0){
-                        $item->status = Campaign::STATUS_COMPLETED;
-                    }
+
+                $status = $item->response_report_callback['status'];
+                if (
+                    $item->response_report_callback['pending'] == 0
+                    || $item->response_report_callback['success'] === false
+                    || !in_array($status, [200, 201], true)
+                ) {
+                    $item->status = Campaign::STATUS_COMPLETED;
+                    $item->user->credits += $item->response_report_callback['credits_refund'] ?? 0;
+                    $item->user->save();
                 }
                 $item->receiver_s->each(function ($i) use ($item) {
                     $i->status = $item->status;
@@ -211,8 +213,9 @@ class ActionServerHelper
             $callback['success'] = ActionServerHelper::getByPath(
                 $result,
                 $mapping['success'] ?? 'success',
-                false
-            );
+                $response->successful() ?? false
+
+        );
 
             $callback['status'] = ActionServerHelper::getByPath(
                 $result,

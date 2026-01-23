@@ -14,9 +14,9 @@ Route::name('web.')->group(function () {
         Route::prefix('login')->name('login.')->group(function () {
             Route::post('/', 'store')->name('store');
         });
-//        Route::prefix('register')->name('register.')->group(function () {
-//            Route::post('/', 'RegisterStore')->name('store');
-//        });
+        Route::prefix('register')->name('register.')->group(function () {
+            Route::post('/', 'registerStore')->name('store');
+        });
     });
 
     Route::middleware(['auth'])->group(function () {

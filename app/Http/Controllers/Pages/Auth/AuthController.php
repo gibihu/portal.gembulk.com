@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Pages\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Users\Role;
+use App\Models\Users\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Mockery\Exception;
@@ -33,5 +36,22 @@ class AuthController extends Controller
                 'email' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function registerStore(Request $request)
+    {
+        $validated = $request->validate([
+            'username' => 'required|string|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => ['required', Password::defaults()],
+        ]);
+
+        $data = array_merge($validated, [
+            'roles' => Role::where('name', 'user')->pluck('id')->toArray(),
+        ]);
+        $user = User::create($data);
+
+        return redirect()->route('web.home');
     }
 }
