@@ -58,46 +58,47 @@ class ActionServerHelper
         return $item;
     }public static function ActionReportSMS(Campaign $item): Campaign|bool|array
     {
-        try{
-            $now = Carbon::now();
-            $server = $item->server;
-            $ac = $server->action_report_sms;
-            if(empty($ac->endpoint) || empty($ac->method)){ return false; }
+        $now = Carbon::now();
+        $server = $item->server;
+        $ac = $server->action_report_sms;
+        if(empty($ac->endpoint) || empty($ac->method)){ return false; }
 
-            $sender = $item->sender;
-            $headers = $ac->headers;
-            $param = ActionServerHelper::SortBody($ac->body, $item, $sender);
+        $sender = $item->sender;
+        $headers = $ac->headers;
+        $param = ActionServerHelper::SortBody($ac->body, $item, $sender);
 
 
-            $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
-            if($sent !== false){
-                [$item->response_report, $item->response_report_callback] = $sent;
-                $item->sent_at = $now->format('Y-m-d H:i:s');
+        $sent = ActionServerHelper::sendRequest($ac, $ac->method, $ac->endpoint, $headers, $param);
+        if($sent !== false){
+            [$item->response_report, $item->response_report_callback] = $sent;
+            $item->sent_at = $now->format('Y-m-d H:i:s');
 
-                $status = $item->response_report_callback['status'];
+            $status = $item->response_report_callback['status'];
+            if (
+                $item->response_report_callback['pending'] == 0
+                || $item->response_report_callback['success'] === false
+                || !in_array($status, [200, 201], true)
+            ) {
                 if (
-                    $item->response_report_callback['pending'] == 0
-                    || $item->response_report_callback['success'] === false
-                    || !in_array($status, [200, 201], true)
+                    $item->response_report_callback['credits_refund']
+                    == $item->response_report_callback['failed']
                 ) {
                     $item->status = Campaign::STATUS_COMPLETED;
-                    $item->user->credits += $item->response_report_callback['credits_refund'] ?? 0;
+
+                    $refund = $item->response_report_callback['credits_refund'] ?? 0;
+
+                    $item->user->credits += $refund;
+
                     $item->user->save();
                 }
-                $item->receiver_s->each(function ($i) use ($item) {
-                    $i->status = $item->status;
-                    $i->save();
-                });
-
-            }else{
-                $item->status = Campaign::STATUS_FAILED;
             }
-            return $item;
-        }catch (Throwable $e){
-            return[
-                'message' => $e->getMessage(),
-            ];
+            $item->receiver_s->each(function ($i) use ($item) {
+                $i->status = $item->status;
+                $i->save();
+            });
+
         }
+        return $item;
     }
     public static function GetKeyValue(array $array): array
     {

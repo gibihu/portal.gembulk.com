@@ -8,4 +8,4 @@ use Illuminate\Support\Facades\Artisan;
 //})->purpose('Display an inspiring quote');
 
 Schedule::command('app:send-sms')->everyMinute()->withoutOverlapping();
-Schedule::command('app:send-sms-report')->everyMinute()->withoutOverlapping();
+Schedule::command('app:send-sms-report')->everyFiveMinutes()->withoutOverlapping();

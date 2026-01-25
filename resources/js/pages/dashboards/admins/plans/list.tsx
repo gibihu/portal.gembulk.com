@@ -9,7 +9,7 @@ import { PlanType } from "@/types/plan";
 import { toast } from "sonner";
 import web from "@/routes/web";
 import api from "@/routes/api";
-import { Loader, SquarePen } from "lucide-react";
+import { Loader, Plus, SquarePen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -54,7 +54,14 @@ export default function PlansListPage(request: any) {
             <Head title="Dashboard" />
             <Card>
                 <CardHeader>
-                    รายการแพลนทั้งหมด
+                    <div className="flex justify-between">
+                        <span>รายการแพลนทั้งหมด</span>
+                        <div className="flex gap-2">
+                            <Link href={web.dashboard.admins.plans.add().url}>
+                                <Button><Plus /></Button>
+                            </Link>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (

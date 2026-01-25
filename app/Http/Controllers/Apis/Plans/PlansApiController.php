@@ -12,10 +12,10 @@ class PlansApiController extends Controller
     public function index(Request $request)
     {
         try{
-            $plans = Plan::where('public', true)->get();
+            $plans = Plan::where('status', Plan::STATUS_PUBLISHED)->get();
             return response()->json([
                 'message' => 'Success',
-                'plans' => $plans,
+                'data' => $plans,
                 'code' => 200
             ], 200);
         }catch (Exception $e) {

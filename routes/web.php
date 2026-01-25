@@ -52,7 +52,8 @@ Route::name('web.')->group(function () {
                 });
                 Route::prefix('plans')->name('plans.')->group(function () {
                     Route::get('/', 'plansIndex')->name('index');
-                    Route::get('/{id}', 'plansPayment')->name('payment');
+                    Route::get('/pay/{id}', 'plansPayment')->name('payment');
+                    Route::get('/{id}', 'preview')->name('preview');
                 });
             });
 
@@ -72,7 +73,7 @@ Route::name('web.')->group(function () {
                 Route::prefix('plans')->name('plans.')->group(function () {
                     Route::get('/', 'plansIndex')->name('index');
                     Route::get('add', 'plansAdd')->name('add');
-                    Route::get('edit/{id}', 'plansEdit')->name('edit'); 
+                    Route::get('edit/{id}', 'plansEdit')->name('edit');
                 });
             });
         });

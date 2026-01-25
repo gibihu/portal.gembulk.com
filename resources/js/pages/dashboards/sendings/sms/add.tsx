@@ -22,7 +22,7 @@ import { SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head, router, usePage } from "@inertiajs/react";
 import { addYears } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่ง sms',
-        href: web.dashboard.sending.sms.add().url,
+        href: web.dashboard.sending.sms.add().url ?? '',
     },
 ];
 export default function SmsAddPage(request: any) {
@@ -91,6 +91,7 @@ export default function SmsAddPage(request: any) {
 
     function submit(data: FormValues) {
         const fetchData = async () => {
+            setIsFetch(true);
             try {
                 const res = await fetch(api.sms.create().url, {
                     method: "POST",
@@ -333,7 +334,8 @@ export default function SmsAddPage(request: any) {
                         </Card>
 
                         <div className="w-full flex justify-end">
-                            <Button type="submit">
+                            <Button type="submit" disabled={isFetch}>
+                                {isFetch && <Loader className="size-4 animate-spin" />}
                                 บันทึก
                             </Button>
                         </div>

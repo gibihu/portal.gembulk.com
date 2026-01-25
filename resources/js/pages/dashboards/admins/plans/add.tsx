@@ -10,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import web from '@/routes/web';
 import { type BreadcrumbItem } from '@/types';
 import { ServerType } from '@/types/user';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray, type SubmitHandler } from 'react-hook-form';
 import { set, z } from 'zod';
@@ -29,11 +29,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // Zod schema for plan form
 const planSchema = z.object({
+    id: z.string().min(1, "ID เป็นสิ่งจำเป็น"),
     name: z.string().min(1, "ชื่อเป็นสิ่งจำเป็น"),
     description: z.string().optional().nullable(),
     details: z.string().optional().nullable(),
     price: z.number().min(0, "ราคาต้องเป็นตัวเลขที่มากกว่า 0"),
-    credits: z.number().min(0, "เครดิตต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0"),
+    credit_limit: z.number().min(0, "เครดิตต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0"),
     duration: z.number().min(1, "ระยะเวลาต้องเป็นตัวเลข"),
     duration_unit: z.string().min(1, "กรุณาเลือกหน่วยเวลา"),
     options: z.record(z.string(), z.string()).optional(),
@@ -54,29 +55,30 @@ const serverSupportedOptions = [
 ];
 
 const durationUnitOptions = [
-    { label: "วัน", value: "1" },
-    { label: "เดือน", value: "2" },
-    { label: "ปี", value: "3" },
-    { label: "ตลอดไป", value: "4" },
+    { label: "วัน", value: "0" },
+    { label: "เดือน", value: "1" },
+    { label: "ปี", value: "2" },
+    { label: "ตลอดไป", value: "3" },
 ];
 
 export default function PlanAddPage(request: any) {
     console.log(request);
 
+    const csrfToken = request.csrf;
     const [servers, setServers] = useState<ServerType[]>([]);
     const [plan, setPlan] = useState<PlanType>(request.plan || null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isFetch, setIsFetch] = useState<boolean>(false);
 
     const defaultValues: PlanFormValues = {
+        id: plan?.id || '',
         name: plan?.name || '',
         description: plan?.description || '',
         details: plan?.details || '',
         price: Number(plan?.price) || 0,
-        credits: Number(plan?.credits) || 0,
+        credit_limit: Number(plan?.credit_limit) || 0,
         duration: Number(plan?.duration) || 1,
-        duration_unit: Number(plan?.duration_unit).toString() || '1',
+        duration_unit: plan?.duration_unit?.toString() || "0",
         options: typeof plan?.options === 'object' && !Array.isArray(plan?.options) ? plan.options : {},
         servers: plan?.servers || [],
     };
@@ -89,7 +91,7 @@ export default function PlanAddPage(request: any) {
 
     useEffect(() => {
         const fetchData = async () => {
-            setIsFetch(true);
+            setIsLoading(true);
             try {
                 const way = api.admins.servers.index();
                 const res = await fetch(way.url);
@@ -103,22 +105,42 @@ export default function PlanAddPage(request: any) {
                 console.error('Error fetching plans data:', error);
                 toast.error('Failed to fetch plans data.');
             } finally {
-                setIsFetch(false);
+                setIsLoading(false);
             }
         }
         fetchData();
     }, []);
 
     const onSubmit: SubmitHandler<PlanFormValues> = (data) => {
-        setIsSubmitting(true);
-        try {
-            console.log('Form data:', data);
-            // Handle form submission here
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
+        console.log('Form data:', data);
+        const fetchData = async () => {
+            setIsFetch(true);
+            try {
+                const way = api.admins.plans.store();
+                const res = await fetch(way.url, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(data),
+                });
+                const response = await res.json();
+                if (res.ok) {
+                    toast.success('บันทึกแผนเรียบร้อยแล้ว');
+                    form.reset();
+                    router.visit(web.dashboard.admins.plans.index().url);
+                } else {
+                    toast.error(response.message || 'เกิดข้อผิดพลาดในการบันทึกแผน', { description: response.description ?? '' });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                toast.error('เกิดข้อผิดพลาดในการบันทึกแผน', { description: error instanceof Error ? error.message : '' });
+            } finally {
+                setIsFetch(false);
+            }
+        };
+        fetchData();
     };
 
     return (
@@ -130,8 +152,9 @@ export default function PlanAddPage(request: any) {
                     <div className="flex flex-col gap-4">
                         {/* Submit Button Top */}
                         <div className="w-full flex justify-end">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
+                            <Button type="submit" disabled={isFetch}>
+                                {isFetch && <Loader className="size-4 animate-spin" />}
+                                บันทึก
                             </Button>
                         </div>
 
@@ -153,6 +176,15 @@ export default function PlanAddPage(request: any) {
                                                 <Input placeholder="ชื่อแผน" {...field} />
                                             </FormControl>
                                             <FormMessage />
+                                            <FormField
+                                                control={form.control}
+                                                name="id"
+                                                render={({ field }) => (
+                                                    <FormItem className="col-span-2 flex flex-col items-start">
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </FormItem>
                                     )}
                                 />
@@ -172,10 +204,10 @@ export default function PlanAddPage(request: any) {
                                     )}
                                 />
 
-                                {/* Credits */}
+                                {/* credit_limit */}
                                 <FormField
                                     control={form.control}
-                                    name="credits"
+                                    name="credit_limit"
                                     render={({ field }) => (
                                         <FormItem className="col-span-2 flex flex-col items-start">
                                             <FormLabel>เครดิต</FormLabel>
@@ -378,7 +410,7 @@ export default function PlanAddPage(request: any) {
                                 <CardDescription>เลือกเซิร์ฟเวอร์ที่ใช้กับแผนนี้</CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-col gap-4 pt-6 bg-accent p-4">
-                                {isFetch ? (
+                                {isLoading ? (
                                     <div className="w-full flex items-center justify-center">
                                         <Loader className="size-4 animate-spin" />
                                     </div>
@@ -406,11 +438,10 @@ export default function PlanAddPage(request: any) {
                                                                                 : [...current, String(server.id)];
                                                                             field.onChange(updated);
                                                                         }}
-                                                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                                                                            isSelected
-                                                                                ? 'border-primary bg-primary/10'
-                                                                                : 'border-foreground/20 hover:border-primary/50'
-                                                                        }`}
+                                                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-colors cursor-pointer ${isSelected
+                                                                            ? 'border-primary bg-primary/10'
+                                                                            : 'border-foreground/20 hover:border-primary/50'
+                                                                            }`}
                                                                     >
                                                                         <Server className="w-5 h-5 flex-shrink-0" />
                                                                         <span className="text-sm font-medium truncate">
@@ -434,8 +465,9 @@ export default function PlanAddPage(request: any) {
 
                         {/* Submit Button Bottom */}
                         <div className="w-full flex justify-end">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
+                            <Button type="submit" disabled={isFetch}>
+                                {isFetch && <Loader className="size-4 animate-spin" />}
+                                บันทึก
                             </Button>
                         </div>
                     </div>

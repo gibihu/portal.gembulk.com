@@ -75,7 +75,7 @@ class WebDashPageController extends Controller
 
     public function plansPayment(Request $request, $id)
     {
-        $plan = Plan::find($id);
+        $plan = Plan::findOrFail($id);
         return Inertia::render('dashboards/plans/payment', compact('plan'));
     }
 }

@@ -219,12 +219,65 @@ class SendingTableSeeder extends Seeder
             $sender = Sender::create($item);
         }
 
-        $plan = Plan::create([
-            'name' => 'Starter Set',
-            'servers' => [$server->id],
-            'price' => 100,
-            'credits' => 1500,
-        ]);
+        $plans = [
+            [
+                'name' => 'Starter',
+                'servers' => [$server->id],
+                'price' => 1000,
+                'credit_limit' => 3030,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 3,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.33,
+            ],
+            [
+                'name' => 'Basic',
+                'servers' => [$server->id],
+                'price' => 10000,
+                'credit_limit' => 35741,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 6,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.28,
+            ],
+            [
+                'name' => 'Corporate',
+                'description' => 'รายละเอียกจำลอง',
+                'servers' => [$server->id],
+                'price' => 50000,
+                'credit_limit' => 208333,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 6,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.24,
+                'recommended' => true,
+                'tax_rate' => 0.07,
+            ],
+            [
+                'name' => 'Corporate Special',
+                'servers' => [$server->id],
+                'price' => 100000,
+                'credit_limit' => 500000,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 12,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.2,
+            ],
+            [
+                'name' => 'Enterprise',
+                'servers' => [$server->id],
+                'price' => 300000,
+                'credit_limit' => 1666667,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 999,
+                'duration_unit' => Plan::DURATION_UNIT_LIFETIME,
+                'more_than' => 0.18,
+            ]
+        ];
+
+        foreach ($plans as $plan) {
+            $plan = Plan::create($plan);
+        }
 
         $user = User::firstOrCreate(
             ['email' => 'a@gmail.com'],
@@ -235,7 +288,7 @@ class SendingTableSeeder extends Seeder
                 'roles' => [$role1->id, $role2->id],
                 'plan_id' => $plan->id,
                 'email_verified_at' => now(),
-                'credits' => 1000000,
+                'credits' => $plan->credit_limit,
             ]
         );
 

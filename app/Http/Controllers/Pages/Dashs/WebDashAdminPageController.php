@@ -57,7 +57,10 @@ class WebDashAdminPageController extends Controller
 
     public function plansAdd()
     {
-        return Inertia::render('dashboards/admins/plans/add');
+        $plan = [
+            'id' => str::uuid(),
+        ];
+        return Inertia::render('dashboards/admins/plans/add', compact('plan'));
     }
 
     public function plansEdit(Request $request, $id)

@@ -28,6 +28,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
 
     Route::controller(PlansApiController::class)->prefix('plans')->name('plans.')->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/{id}', 'show')->name('show');
     });
 
     Route::controller(ServerApiController::class)->prefix('servers')->name('servers.')->group(function () {
@@ -50,6 +51,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
 
         Route::controller(PlanAdminApiController::class)->prefix('plans')->name('plans.')->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::post('/store', 'store')->name('store');
         });
     });
 });
