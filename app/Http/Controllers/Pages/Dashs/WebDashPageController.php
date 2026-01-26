@@ -8,6 +8,7 @@ use App\Models\Sendings\Campaign;
 use App\Models\Sendings\Plan;
 use App\Models\Sendings\Servers\Server;
 use App\Models\Sendings\SpamWord;
+use App\Models\Users\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -58,14 +59,10 @@ class WebDashPageController extends Controller
         return Inertia::render('dashboards/senders/add', compact('sender'));
     }
 
-    public function templateOTP(Request $request)
+    public function apiIndex(Request $request)
     {
-        $server_id = $request->user()->plan->servers[0];
-        $server = [
-            'id' => $server_id,
-        ];
-
-        return Inertia::render('dashboards/otp/templates/add', compact('server'));
+        $apiKeys = $request->user()->load('apiKeys')->apiKeys;
+        return Inertia::render('dashboards/otp/templates/add', compact('apiKeys'));
     }
 
     public function plansIndex()

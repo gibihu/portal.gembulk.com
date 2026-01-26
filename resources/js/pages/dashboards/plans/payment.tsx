@@ -170,7 +170,7 @@ export default function PlanPaymentPage(request: any) {
                                     </CardHeader>
                                     <CardContent>
                                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                                            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="max-w-sm">
+                                            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="">
                                                 <FieldLabel htmlFor="qr-prompts">
                                                     <Field orientation="horizontal">
                                                         <FieldContent>

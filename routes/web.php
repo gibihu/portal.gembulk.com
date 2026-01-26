@@ -48,12 +48,15 @@ Route::name('web.')->group(function () {
                     Route::get('reports', 'reportCampaigns')->name('reports');
                 });
                 Route::prefix('otp')->name('otp.')->group(function () {
-                    Route::get('template', 'templateOTP')->name('template');
+//                    Route::get('template', 'templateOTP')->name('template');
                 });
                 Route::prefix('plans')->name('plans.')->group(function () {
                     Route::get('/', 'plansIndex')->name('index');
                     Route::get('/pay/{id}', 'plansPayment')->name('payment');
                     Route::get('/{id}', 'preview')->name('preview');
+                });
+                Route::prefix('api')->name('api.')->group(function () {
+                    Route::get('/', 'apiIndex')->name('index');
                 });
             });
 

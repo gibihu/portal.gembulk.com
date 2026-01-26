@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models\Sendings;
+namespace App\Models\Users;
 
-use App\Models\Users\User;
 use App\Traits\GlobalStatusTrait;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +10,7 @@ class ApiKey extends Model
 {
     use GlobalStatusTrait;
     use HasUuids;
-    protected $table = 'sd_senders';
+    protected $table = 'sd_api_keys';
     protected $keyType = 'string';
     public $incrementing = false;
 
@@ -39,7 +38,7 @@ class ApiKey extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public static function generateUniqueToken(): string
+    public static function generateKey(): string
     {
         do {
             // สุ่ม 32 bytes = 64 ตัวอักษร hex

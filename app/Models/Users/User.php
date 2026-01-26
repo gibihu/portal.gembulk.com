@@ -5,10 +5,7 @@ namespace App\Models\Users;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Sendings\Plan;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
@@ -52,6 +49,11 @@ class User extends Authenticatable
     public function plan()
     {
         return $this->belongsTo(Plan::class, 'plan_id', 'id');
+    }
+
+    public function apiKeys()
+    {
+        return $this->hasMany(ApiKey::class);
     }
 
 //    แปลงเป็นข้อความ

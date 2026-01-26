@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot } from 'lucide-react';
+import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavProjects } from './nav-project';
 import web from '@/routes/web';
@@ -62,12 +62,6 @@ export function AppSidebar() {
                     isActive: false,
                 },
                 {
-                    title: "OTP Template",
-                    href: web.dashboard.otp.template.url(),
-                    icon: Notebook,
-                    isActive: false,
-                },
-                {
                     title: "Jobs",
                     href: web.dashboard.jobs.sms().url,
                     icon: Bot,
@@ -77,6 +71,12 @@ export function AppSidebar() {
                     title: "Reports",
                     href: web.dashboard.campaigns.reports().url,
                     icon: Layers,
+                    isActive: false,
+                },
+                {
+                    title: "Api",
+                    href: web.dashboard.api.index().url,
+                    icon: KeyRound,
                     isActive: false,
                 },
             ],
