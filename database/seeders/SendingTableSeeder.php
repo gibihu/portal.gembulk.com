@@ -303,7 +303,7 @@ class SendingTableSeeder extends Seeder
             'data' => [
                 'cost' => 1,
                 'real_cost' => 1,
-                'phone_counts' => 1,
+                'receiver_count' => 1,
             ],
             'total_cost' => 1,
             'status' => Campaign::STATUS_PENDING,
@@ -322,7 +322,7 @@ class SendingTableSeeder extends Seeder
             'data' => [
                 'cost' => 2,
                 'real_cost' => 2,
-                'phone_counts' => 1,
+                'receiver_count' => 1,
             ],
             'total_cost' => 2,
             'status' => Campaign::STATUS_PENDING,
