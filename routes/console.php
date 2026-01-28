@@ -9,3 +9,6 @@ use Illuminate\Support\Facades\Artisan;
 
 Schedule::command('app:send-sms')->everyMinute()->withoutOverlapping();
 Schedule::command('app:send-sms-report')->everyFiveMinutes()->withoutOverlapping();
+
+Schedule::command('app:send-otp')->everyFiveSeconds()->withoutOverlapping();
+Schedule::command('app:send-otp-report')->everyFiveSeconds()->withoutOverlapping();

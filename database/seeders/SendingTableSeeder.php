@@ -102,7 +102,7 @@ class SendingTableSeeder extends Seeder
                 "server_id" => $server->id,
                 "action_key" => "otp",
                 "method" => "POST",
-                "endpoint" => "",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/send",
                 "headers" => [
                     "Content-Type" => "application/json",
                     "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
@@ -113,11 +113,11 @@ class SendingTableSeeder extends Seeder
                         "isArray" => false
                     ],
                     [
-                        "sender" => null,
+                        "sender" => "sender_name",
                         "isArray" => false
                     ],
                     [
-                        "receiver" => null,
+                        "receivers" => "phone_numbers",
                         "isArray" => false
                     ],
                     [
@@ -126,9 +126,10 @@ class SendingTableSeeder extends Seeder
                     ]
                 ],
                 "response" => [
-                    "status" => "success",
+                    "success" => "success",
                     "message" => "message",
-                    "ref_id" => "campaign_id"
+                    "ref_id" => "campaign_id",
+                    "credits" => "credits",
                 ],
                 "settings" => null,
                 "status" => 0,
@@ -136,38 +137,33 @@ class SendingTableSeeder extends Seeder
             [
                 "server_id" => $server->id,
                 "action_key" => "otp_report",
-                "method" => "POST",
-                "endpoint" => "",
+                "method" => "GET",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/report",
                 "headers" => [
                     "Content-Type" => "application/json",
                     "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
-                        "message" => "message",
+                        "ref_id" => "campaign_id",
                         "isArray" => false
                     ],
-                    [
-                        "sender" => null,
-                        "isArray" => false
-                    ],
-                    [
-                        "receiver" => null,
-                        "isArray" => false
-                    ],
-                    [
-                        "scheduled_at" => "false",
-                        "isArray" => false
-                    ]
                 ],
                 "response" => [
-                    "status" => "success",
                     "message" => "message",
-                    "ref_id" => "campaign_id"
+                    "credits_refund" => "campaigns.0.credits_refund",
+                    "total_receiver" => "campaigns.0.all_numbers",
+                    "passed" => "campaigns.0.success",
+                    "sent" => "campaigns.0.sent",
+                    "failed" => "campaigns.0.failed",
+                    "pending" => "campaigns.0.pending",
+                    "sender_name" => "campaigns.0.sender_name",
+                    "ref_id" => "campaigns.0.id",
+                    "campaign_name" => "campaigns.0.campaign_name",
                 ],
                 "settings" => null,
                 "status" => 0,
-            ]
+            ],
         ];
 
         foreach ($server_actions_data as $action) {

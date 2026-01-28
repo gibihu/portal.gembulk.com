@@ -140,9 +140,14 @@ return [
         ],
 
         // ===== OTP =====
-        'otp' => [
+        'otp_sent' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/cronjobs/otp/otp.log'),
+            'path' => storage_path('logs/cronjobs/otp/sent/otp.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+        'otp_report' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/cronjobs/otp/report/otp.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 

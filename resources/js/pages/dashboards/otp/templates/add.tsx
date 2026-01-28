@@ -1,29 +1,27 @@
+import { Code } from "@/components/custom_ui/code";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
-import servers from "@/routes/api/servers";
+import { DateHelper } from "@/lib/date";
+import { GetServerByUser } from "@/models/servers/get";
+import api from "@/routes/api";
 import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
-import { ServerType } from "@/types/user";
+import { ApiKeyType } from "@/types/api";
+import { SenderType, ServerType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head } from "@inertiajs/react";
+import { Copy, Edit, Info, Loader, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Info, Loader, Edit, Plus, Copy, CheckCircle } from "lucide-react";
-import { useState } from "react";
-import z from "zod";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Code } from "@/components/custom_ui/code";
-import { ApiKeyType } from "@/types/api";
-import { Checkbox } from "@/components/ui/checkbox";
-import api from "@/routes/api";
 import { toast } from "sonner";
-import { toTimestamp } from "@/lib/timestamp";
-import { DateHelper } from "@/lib/date";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import z from "zod";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,7 +36,7 @@ const apiKeyFormSchema = z.object({
     api_key: z.string().min(1, "API Key ต้องไม่ว่าง"),
     template: z.string(),
     options: z.record(z.string(), z.boolean()),
-    permissions: z.record(z.string(), z.boolean()),
+    permissions: z.record(z.string(), z.any()),
 });
 
 type ApiKeyFormType = z.infer<typeof apiKeyFormSchema>;
@@ -52,6 +50,26 @@ export default function OtpTemplatePage(request: any) {
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [showConfirmRegen, setShowConfirmRegen] = useState<boolean>(false);
+    const [servers, setServers] = useState<ServerType[]>([]);
+    const [senders, setSenders] = useState<SenderType[]>([]);
+    
+
+    useEffect(() => {
+        const fetchServers = async () => {
+            const serversData = await GetServerByUser(['with=senders'], setIsFetch);
+            if (serversData.length == 0) {
+                setIsFetch(true);
+                toast.error('ไม่พบเซิฟเวอร์', { description: "ระบบไม่พบเซิฟเวอร์ กรุณาซื้อแพ็กเกจ" });
+            }else{
+                setServers(serversData);
+                setSenders(serversData[0].senders || []);
+            }
+
+
+        };
+
+        fetchServers();
+    }, []);
 
     const apiKeyForm = useForm<ApiKeyFormType>({
         resolver: zodResolver(apiKeyFormSchema),
@@ -149,6 +167,7 @@ export default function OtpTemplatePage(request: any) {
             permissions: {
                 read: false,
                 write: false,
+                senders: [],
             },
         });
         callNewToken();
@@ -169,7 +188,7 @@ export default function OtpTemplatePage(request: any) {
             api_key: apiKey.token || "",
             template: apiKey.template || "",
             options: apiKey.options || optionsList,
-            permissions: apiKey.permissions || {},
+            permissions: apiKey.permissions || { senders: [] },
         });
         setShowConfirmRegen(false);
         setIsDialogOpen(true);
@@ -333,6 +352,49 @@ export default function OtpTemplatePage(request: any) {
                                                     />
                                                     <label htmlFor="perm_write">เขียน (Write)</label>
                                                 </div>
+                                            </div>
+                                        </FormItem>
+
+                                        {/* Senders Toggle */}
+                                        <FormItem>
+                                            <FormLabel>ผู้ส่ง</FormLabel>
+                                            <div className="space-y-2">
+                                                {senders.length === 0 ? (
+                                                    <p className="text-sm text-gray-500">ไม่พบผู้ส่ง</p>
+                                                ) : (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {senders.map((sender) => {
+                                                            const currentSenders = apiKeyForm.watch("permissions.senders") ?? [];
+                                                            const isSelected = currentSenders.includes(sender.id);
+                                                            return (
+                                                                <Button
+                                                                    key={sender.id}
+                                                                    type="button"
+                                                                    variant={isSelected ? "default" : "outline"}
+                                                                    size="sm"
+                                                                    onClick={() => {
+                                                                        const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
+                                                                        if (isSelected) {
+                                                                            // Remove sender
+                                                                            apiKeyForm.setValue(
+                                                                                "permissions.senders",
+                                                                                sendersList.filter((id: string) => id !== sender.id)
+                                                                            );
+                                                                        } else {
+                                                                            // Add sender
+                                                                            apiKeyForm.setValue(
+                                                                                "permissions.senders",
+                                                                                [...sendersList, sender.id]
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {sender.name}
+                                                                </Button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                             </div>
                                         </FormItem>
 

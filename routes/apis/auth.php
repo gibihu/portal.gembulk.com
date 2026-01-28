@@ -22,6 +22,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     });
 
     Route::controller(SenderApiController::class)->prefix('senders')->name('senders.')->group(function () {
+//        Route::get('/', 'index')->name('index');
         Route::post('/request', 'senderRequest')->name('request');
         Route::post('/status', 'senderStatus')->name('status');
         Route::delete('/delete', 'senderDelete')->name('delete');

@@ -8,14 +8,14 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class sendSmsReport extends Command
+class SendOtpReport extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:send-sms-report';
+    protected $signature = 'app:send-otp-report';
 
     /**
      * The console command description.
@@ -29,30 +29,30 @@ class sendSmsReport extends Command
      */
     public function handle()
     {
-        $action_key_upper = 'Report SMS';
-        Log::channel('sms_report')->info('---> Start ' . $action_key_upper);
+        $action_key_upper = 'Report OTP';
+        Log::channel('otp_report')->info('---> Start ' . $action_key_upper);
         try{
             $limit = 50;
 
             Campaign::where('status', Campaign::STATUS_UNDER_REVIEW)
-                ->where('action_key', 'sms_report')
+                ->where('action_key', 'otp')
                 ->limit($limit)
                 ->cursor()
                 ->each(function ($item) {
-                    Log::channel('sms_report')->info('--> Processing "' . $item->name . '"');
-                    $item = ActionServerHelper::ActionReportSMS($item);
+                    Log::channel('otp_report')->info('--> Processing "' . $item->name . '"');
+                    $item = ActionServerHelper::ActionReportOTP($item);
                     if($item !== false){
                         $item->save();
-                        Log::channel('sms_report')->info('--> Action completed');
+                        Log::channel('otp_report')->info('--> Action completed');
                     }else{
-                        Log::channel('sms_report')->error('--> Cannot send SMS Report');
+                        Log::channel('otp_report')->error('--> Cannot send OTP Report');
                     }
                 }
                 );
         } catch (Throwable $e) {
-            Log::channel('sms_report')->error('--> Error: ' . $e->getMessage());
+            Log::channel('otp_report')->error('--> Error: ' . $e->getMessage());
         }
 
-        Log::channel('sms_report')->info('---> End ' . $action_key_upper);
+        Log::channel('otp_report')->info('---> End ' . $action_key_upper);
     }
 }

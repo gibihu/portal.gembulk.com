@@ -90,6 +90,9 @@ Route::controller(CronjobTestController::class)->prefix('test')->name('test.')->
                 Route::get('/', 'sendingSMS')->name('index');
                 Route::get('reports', 'ReportSMS')->name('reports');
             });
+            Route::prefix('otp')->name('otp.')->group(function () {
+                Route::get('/report', 'ReportOTP')->name('index');
+            });
         });
     });
 });
