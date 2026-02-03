@@ -37,7 +37,7 @@ const planSchema = z.object({
     credit_limit: z.number().min(0, "เครดิตต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0"),
     duration: z.number().min(1, "ระยะเวลาต้องเป็นตัวเลข"),
     duration_unit: z.string().min(1, "กรุณาเลือกหน่วยเวลา"),
-    options: z.record(z.string(), z.string()).optional(),
+    options: z.record(z.string(), z.string()).optional().nullable(),
     servers: z.array(z.string()).optional(),
 });
 

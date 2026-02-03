@@ -5,6 +5,7 @@ use App\Http\Controllers\Apis\Admins\Sender\SenderAdminApiController;
 use App\Http\Controllers\Apis\Admins\Servers\ServerAdminApiController;
 use App\Http\Controllers\Apis\ApiKeyController;
 use App\Http\Controllers\Apis\Dashs\Sending\SMSApiController;
+use App\Http\Controllers\Apis\Payments\PaymentApiController;
 use App\Http\Controllers\Apis\Plans\PlansApiController;
 use App\Http\Controllers\Apis\Senders\SenderApiController;
 use App\Http\Controllers\Apis\Servers\ServerApiController;
@@ -40,6 +41,10 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::controller(ApiKeyController::class)->prefix('keys')->name('keys.')->group(function () {
         Route::get('/generate', 'generate')->name('generate');
         Route::post('/store', 'store')->name('store');
+    });
+
+    Route::controller(PaymentApiController::class)->prefix('payments')->name('payments.')->group(function () {
+        Route::post('qrPay', 'qrPay')->name('qr');
     });
 
     Route::prefix('admins')->name('admins.')->group(function () {

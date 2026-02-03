@@ -17,6 +17,11 @@ import { BreadcrumbItem } from "@/types";
 import { PlanType } from "@/types/plan";
 import { Head } from "@inertiajs/react";
 import { useState } from "react";
+import { set } from "zod";
+import api from "@/routes/api";
+import { Currency } from "lucide-react";
+import { toast } from "sonner";
+import { TransactionType } from "@/types/transaction";
 
 
 
@@ -27,22 +32,70 @@ export default function PlanPaymentPage(request: any) {
             href: web.dashboard.plans.payment({ id: request.plan.id }).url ?? '',
         },
     ];
+    const csrfToken = request.csrf;
     const [plan, setPlan] = useState<PlanType>(request.plan);
     const [paymentMethod, setPaymentMethod] = useState<string>('qr-prompts');
     const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
     const [isPaying, setIsPaying] = useState<boolean>(false);
+    const [isFetch, setIsFetch] = useState<boolean>(false);
+    const [transaction, setTransaction] = useState<TransactionType>({} as TransactionType);
 
     const bill = {
         main: plan,
         plan_id: plan ? plan.id : '',
         tax: plan ? plan.price * plan.tax_rate : 0,
+        fee: 20,
         tax_invoice: false,
-        total: plan ? plan.price + (plan.price * plan.tax_rate) + plan.fee_rate : 0,
+        total: plan ? plan.price + (plan.price * plan.tax_rate) + 20 : 0,
+        currency: plan ? plan.currency : 'THB',
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setShowPaymentDialog(true);
+        const fetchData = async () => {
+            setIsFetch(true);
+            try {
+                const way = api.payments.qr();
+                const res = await fetch(way.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        transaction_id: transaction.id,
+                        plan_id: bill.plan_id,
+                        fee: bill.fee,
+                        payment_method: paymentMethod,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if(data.code == 200 || data.code == 201){
+                    const result = data.data;
+                    console.log('Payment initiation response:', data);
+                    setTransaction(result);
+                    setShowPaymentDialog(true);
+                }else if(data.code == 503){
+                    toast.error(data.message, {description: data.description});
+                    throw new Error('Service Unavailable');
+                }else if(data.code == 429){
+                    toast.error(data.message, {description: data.description});
+                    throw new Error('Too Many Requests');
+                } else {
+                    toast.error(data.message, {description: data.description});
+                    throw new Error('Failed to initiate payment');
+                }
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            } finally {
+                setIsFetch(false);
+            }
+        };
+
+        fetchData();
     };
 
     const handlePaymentSuccess = () => {
@@ -88,8 +141,8 @@ export default function PlanPaymentPage(request: any) {
                 </div>
                 <Card>
                     <CardContent>
-                        <div className="grid grid-cols-6 gap-4">
-                            <div className="col-span-4">
+                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                            <div className="col-span-1 md:col-span-4">
                                 <Card className="p-0">
                                     <CardContent className="p-4">
                                         <Table>
@@ -99,8 +152,8 @@ export default function PlanPaymentPage(request: any) {
                                                         <span className="capitalize text-lg font-medium">{bill.main.name}</span>
                                                         <span className="capitalize text-muted-foreground">{bill.main.description}</span>
                                                     </TableCell>
-                                                    <TableCell className="text-right font-medium content-start">
-                                                        {bill.main.price.toLocaleString()}
+                                                    <TableCell className="text-right font-bold content-start">
+                                                        {bill.main.price.toLocaleString()} {bill.main.currency}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -110,7 +163,7 @@ export default function PlanPaymentPage(request: any) {
                             </div>
 
 
-                            <div className="col-span-2 flex flex-col gap-4">
+                            <div className="col-span-1 md:col-span-2 flex flex-col gap-4">
                                 <Card>
                                     <CardHeader>
                                         <h1 className="text-xl font-bold">
@@ -141,7 +194,7 @@ export default function PlanPaymentPage(request: any) {
                                                         {bill.main.fee_label}
                                                     </TableCell>
                                                     <TableCell className="text-right font-medium">
-                                                        {bill.main.fee_rate.toLocaleString()}
+                                                        {bill.fee.toLocaleString()}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -211,17 +264,14 @@ export default function PlanPaymentPage(request: any) {
                         {/* QR Code Placeholder */}
                         <div className="w-72 h-72 bg-white border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
                             <div className="text-center">
-                                <p className="text-gray-400 text-sm mb-2">QR Code PromptPay</p>
-                                <p className="text-gray-600 font-semibold">
-                                    {bill.total.toLocaleString()} {bill.main.currency}
-                                </p>
+                                <img src={transaction.detail?.qr_code} alt={transaction.id} />
                             </div>
                         </div>
 
                         <div className="w-full text-center">
                             <p className="text-sm text-muted-foreground mb-2">รอการชำระเงิน...</p>
                             <p className="text-lg font-bold">
-                                {bill.total.toLocaleString()} {bill.main.currency}
+                                {(Number(transaction.amount) ?? 0).toLocaleString()} {transaction.currency}
                             </p>
                         </div>
                     </div>

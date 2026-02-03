@@ -14,6 +14,7 @@ trait GlobalStatusTrait
     const STATUS_FAILED       = 4;  // ล้มเหลว (system)
     const STATUS_REJECTED     = 5;  // ถูกปฏิเสธ (manual / policy)
     const STATUS_CANCELLED    = 6;  // ถูกยกเลิก
+    const STATUS_EXPIRED      = 7; // หมดอายุ
 
     // ─────────────────────────
     // Usage / Availability
@@ -61,6 +62,7 @@ trait GlobalStatusTrait
         self::STATUS_FAILED       => 'failed',
         self::STATUS_REJECTED     => 'rejected',
         self::STATUS_CANCELLED    => 'cancelled',
+        self::STATUS_EXPIRED      => 'expired',
 
         self::STATUS_ACTIVE       => 'active',
         self::STATUS_INACTIVE     => 'inactive',
@@ -89,6 +91,7 @@ trait GlobalStatusTrait
         'failed'       => self::STATUS_FAILED,
         'rejected'     => self::STATUS_REJECTED,
         'cancelled'    => self::STATUS_CANCELLED,
+        'expired'      => self::STATUS_EXPIRED,
 
         'active'       => self::STATUS_ACTIVE,
         'inactive'     => self::STATUS_INACTIVE,
@@ -126,6 +129,7 @@ trait GlobalStatusTrait
             self::STATUS_CANCELLED,
             self::STATUS_ARCHIVED,
             self::STATUS_DELETED,
+            self::STATUS_EXPIRED,
         ], true);
     }
 

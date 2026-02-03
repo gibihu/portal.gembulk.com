@@ -43,12 +43,15 @@ class PlanAdminApiController extends Controller
                 'price' => $request->price,
                 'credit_limit' => $request->credit_limit,
                 'duration' => $request->duration,
-                'duration_unit' => (int) $request->duration_unit ?? 0,
+                'duration_unit' => (int) ($request->duration_unit ?? 0),
                 'options' => $request->options ?? [],
                 'servers' => $request->servers ?? [],
             ];
 
-            $plan_save = Plan::create($data);
+            $plan_save = Plan::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
 
             return response()->json([
                 'message' => 'success',
