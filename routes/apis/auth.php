@@ -11,7 +11,7 @@ use App\Http\Controllers\Apis\Senders\SenderApiController;
 use App\Http\Controllers\Apis\Servers\ServerApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
+Route::middleware(['auth', 'throttle:10,1'])->prefix('api')->name('api.')->group(function () {
 
     Route::controller(SMSApiController::class)->group(function () {
         Route::prefix('sms')->name('sms.')->group(function () {
