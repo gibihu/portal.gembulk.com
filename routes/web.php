@@ -8,7 +8,7 @@ use App\Http\Controllers\Tests\CronjobTestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::name('web.')->group(function () {
+Route::middleware('throttle:10,1')->name('web.')->group(function () {
 
     Route::controller(AuthController::class)->group(function () {
         Route::prefix('login')->name('login.')->group(function () {
