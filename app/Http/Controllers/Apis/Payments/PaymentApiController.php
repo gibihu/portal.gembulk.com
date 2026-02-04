@@ -30,7 +30,7 @@ class PaymentApiController extends Controller
             ]);
 
             $now = Carbon::now();
-            $start = $now->copy()->setTime(22, 00);
+            $start = $now->copy()->setTime(22, 30);
 
             if ($now->gte($start) || $now->lt($now->copy()->setTime(2, 0))) {
                 return response()->json([
@@ -122,8 +122,10 @@ class PaymentApiController extends Controller
                 if ($trans->user) {
                     $user = $trans->user;
                     $user->credits += $plan->credit_limit ?? 0;
+                    $user->plan_id = $plan->id;
                     $user->save();
                 }
+                $plan->increment('orders');
             }
 
             // ===== Update Detail =====

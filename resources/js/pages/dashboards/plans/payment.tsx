@@ -15,8 +15,8 @@ import AppLayout from "@/layouts/app-layout";
 import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { PlanType } from "@/types/plan";
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, router } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 import { set } from "zod";
 import api from "@/routes/api";
 import { Currency } from "lucide-react";
@@ -50,8 +50,8 @@ export default function PlanPaymentPage(request: any) {
         currency: plan ? plan.currency : 'THB',
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e?: React.FormEvent) => {
+        e?.preventDefault();
         const fetchData = async () => {
             setIsFetch(true);
             try {
@@ -72,19 +72,24 @@ export default function PlanPaymentPage(request: any) {
 
                 const data = await res.json();
 
-                if(data.code == 200 || data.code == 201){
+                if (data.code == 200 || data.code == 201) {
                     const result = data.data;
                     console.log('Payment initiation response:', data);
                     setTransaction(result);
                     setShowPaymentDialog(true);
-                }else if(data.code == 503){
-                    toast.error(data.message, {description: data.description});
+                    if(data.status_text === 'completed') {
+                        toast.success('Payment completed successfully!');
+                        setShowPaymentDialog(false);
+                        router.visit(web.dashboard.plans.index().url ?? '');
+                    }
+                } else if (data.code == 503) {
+                    toast.error(data.message, { description: data.description });
                     throw new Error('Service Unavailable');
-                }else if(data.code == 429){
-                    toast.error(data.message, {description: data.description});
+                } else if (data.code == 429) {
+                    toast.error(data.message, { description: data.description });
                     throw new Error('Too Many Requests');
                 } else {
-                    toast.error(data.message, {description: data.description});
+                    toast.error(data.message, { description: data.description });
                     throw new Error('Failed to initiate payment');
                 }
 
@@ -98,37 +103,17 @@ export default function PlanPaymentPage(request: any) {
         fetchData();
     };
 
-    const handlePaymentSuccess = () => {
-        setIsPaying(true);
+    useEffect(() => {
+        if (!showPaymentDialog) return;
 
-        // ส่งข้อมูล bill ไปยัง onSubmit
-        const paymentData = {
-            bill,
-            paymentMethod,
-            plan_id: bill.plan_id,
-            amount: bill.total,
-            currency: bill.main.currency,
+        const interval = setInterval(() => {
+            handleSubmit();
+        }, 3000); // 3000 ms = 3 วิ
+
+        return () => {
+            clearInterval(interval); // เคลียร์ตอน component unmount หรือค่าเปลี่ยน
         };
-
-        console.log('Payment Data:', paymentData);
-
-        // จำลองการชำระเงิน - ในกรณีจริงต้องเชื่อมต่อ payment gateway
-        setTimeout(() => {
-            // หลังจากชำระเงินแล้ว ให้ปิด dialog และเรียก onSubmit
-            setShowPaymentDialog(false);
-            setIsPaying(false);
-
-            // เรียก onSubmit ที่คุณเตรียมไว้
-            onSubmit(paymentData);
-
-            // หรือใช้ Inertia post
-            // router.post(route('payment.process'), paymentData);
-        }, 2000);
-    };
-
-    function onSubmit(data: any) {
-        console.log('Submitted Data:', data);
-    };
+    }, [showPaymentDialog]);
 
     console.log(request);
     return (
@@ -275,22 +260,6 @@ export default function PlanPaymentPage(request: any) {
                             </p>
                         </div>
                     </div>
-
-                    <DialogFooter className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowPaymentDialog(false)}
-                            disabled={isPaying}
-                        >
-                            ยกเลิก
-                        </Button>
-                        <Button
-                            onClick={handlePaymentSuccess}
-                            disabled={isPaying}
-                        >
-                            {isPaying ? 'กำลังประมวลผล...' : 'ยืนยันการชำระเงิน'}
-                        </Button>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </AppLayout>

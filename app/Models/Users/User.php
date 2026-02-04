@@ -40,11 +40,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
-            'roles' => 'json',
+            'roles' => 'array',
         ];
     }
 
     protected $with = [];
+    protected $appends = [
+    ];
 
     public function plan()
     {
@@ -55,16 +57,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(ApiKey::class);
     }
-
 //    แปลงเป็นข้อความ
     public function getRolesAttribute($value)
     {
         $ids = json_decode($value, true) ?? [];
-        return Role::whereIn('id', $ids)->pluck('name');
+        return Role::whereIn('id', $ids)->pluck('name')->toArray();
     }
 //    แปลงกลับตอนบันทึก
     public function setRolesAttribute($value)
     {
-        $this->attributes['roles'] = json_encode($value);
+        if (is_array($value)) {
+            $this->attributes['roles'] = json_encode($value);
+        } else {
+            $this->attributes['roles'] = json_encode([]);
+        }
     }
 }

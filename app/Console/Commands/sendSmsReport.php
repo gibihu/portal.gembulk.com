@@ -35,7 +35,7 @@ class sendSmsReport extends Command
             $limit = 50;
 
             Campaign::where('status', Campaign::STATUS_UNDER_REVIEW)
-                ->where('action_key', 'sms_report')
+                ->where('action_key', 'sms')
                 ->limit($limit)
                 ->cursor()
                 ->each(function ($item) {

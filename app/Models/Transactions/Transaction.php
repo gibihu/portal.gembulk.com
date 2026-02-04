@@ -43,6 +43,10 @@ class Transaction extends Model
         'tax_invoice'=> 'decimal:2',
     ];
 
+    protected $appends = [
+        'status_text'
+    ];
+
     /** Relations */
 
     public function provider()

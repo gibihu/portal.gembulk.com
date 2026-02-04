@@ -16,8 +16,9 @@ import { BreadcrumbItem } from "@/types";
 import { ApiKeyType } from "@/types/api";
 import { SenderType, ServerType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Head } from "@inertiajs/react";
-import { Copy, Edit, Info, Loader, Plus } from "lucide-react";
+import { Head, Link } from "@inertiajs/react";
+import { is } from "date-fns/locale";
+import { BookMarked, Copy, Edit, Info, Loader, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -52,7 +53,7 @@ export default function OtpTemplatePage(request: any) {
     const [showConfirmRegen, setShowConfirmRegen] = useState<boolean>(false);
     const [servers, setServers] = useState<ServerType[]>([]);
     const [senders, setSenders] = useState<SenderType[]>([]);
-    
+
 
     useEffect(() => {
         const fetchServers = async () => {
@@ -60,7 +61,7 @@ export default function OtpTemplatePage(request: any) {
             if (serversData.length == 0) {
                 setIsFetch(true);
                 toast.error('ไม่พบเซิฟเวอร์', { description: "ระบบไม่พบเซิฟเวอร์ กรุณาซื้อแพ็กเกจ" });
-            }else{
+            } else {
                 setServers(serversData);
                 setSenders(serversData[0].senders || []);
             }
@@ -99,7 +100,7 @@ export default function OtpTemplatePage(request: any) {
 
     const onSubmit = async (data: ApiKeyFormType, index: number | null) => {
         setIsFetch(true);
-        try{
+        try {
             const way = api.keys.store();
             const res = await fetch(way.url, {
                 method: "POST",
@@ -156,23 +157,26 @@ export default function OtpTemplatePage(request: any) {
     };
 
     const openAddDialog = () => {
-        setEditingIndex(null);
-        apiKeyForm.reset({
-            id: null,
-            api_key: "",
-            template: "",
-            options: {
-                option_1: false,
-            },
-            permissions: {
-                read: false,
-                write: false,
-                senders: [],
-            },
-        });
-        callNewToken();
-        setShowConfirmRegen(false);
-        setIsDialogOpen(true);
+        console.log(servers);
+        if (servers.length !== 0 || servers != null) {
+            setEditingIndex(null);
+            apiKeyForm.reset({
+                id: null,
+                api_key: "",
+                template: "",
+                options: {
+                    option_1: false,
+                },
+                permissions: {
+                    read: false,
+                    write: false,
+                    senders: [],
+                },
+            });
+            callNewToken();
+            setShowConfirmRegen(false);
+            setIsDialogOpen(true);
+        }
     };
 
     const optionsList = {
@@ -208,10 +212,17 @@ export default function OtpTemplatePage(request: any) {
                         </div>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button onClick={openAddDialog} className="gap-2">
-                                    <Plus className="size-4" />
-                                    เพิ่ม API Key
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button onClick={openAddDialog} className="gap-2">
+                                        {isFetch ? <Loader className="size-4 animate-spin" /> : <Plus className="size-4" />}
+                                        เพิ่ม API Key
+                                    </Button>
+                                    <Link href={web.dashboard.api.docs().url}>
+                                        <Button variant="outline">
+                                            <BookMarked className="size-4" />
+                                        </Button>
+                                    </Link>
+                                </div>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                                 <DialogHeader>
@@ -295,29 +306,16 @@ export default function OtpTemplatePage(request: any) {
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        id="option_1"
-                                                        checked={apiKeyForm.watch("options.option_1") ?? false}
+                                                        id="otp"
+                                                        checked={apiKeyForm.watch("options.otp") ?? false}
                                                         onCheckedChange={(checked) => {
                                                             apiKeyForm.setValue(
-                                                                "options.option_1",
+                                                                "options.otp",
                                                                 checked as boolean
                                                             );
                                                         }}
                                                     />
-                                                    <label htmlFor="option_1">ตัวเลือก 1</label>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        id="option_2"
-                                                        checked={apiKeyForm.watch("options.option_2") ?? false}
-                                                        onCheckedChange={(checked) => {
-                                                            apiKeyForm.setValue(
-                                                                "options.option_2",
-                                                                checked as boolean
-                                                            );
-                                                        }}
-                                                    />
-                                                    <label htmlFor="option_2">ตัวเลือก 2</label>
+                                                    <label htmlFor="otp">OTP</label>
                                                 </div>
                                             </div>
                                         </FormItem>
@@ -372,6 +370,7 @@ export default function OtpTemplatePage(request: any) {
                                                                     type="button"
                                                                     variant={isSelected ? "default" : "outline"}
                                                                     size="sm"
+                                                                    className="border"
                                                                     onClick={() => {
                                                                         const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
                                                                         if (isSelected) {
@@ -407,8 +406,8 @@ export default function OtpTemplatePage(request: any) {
                                             >
                                                 ยกเลิก
                                             </Button>
-                                            <Button type="submit" disabled={isFetch}>
-                                                {(isFetch) ? <Loader className="animate-spin" /> : "บันทึก"}
+                                            <Button type="submit" disabled={isFetch || servers.length == 0}>
+                                                {(isFetch || servers.length == 0) ? <Loader className="animate-spin" /> : "บันทึก"}
                                             </Button>
                                         </div>
                                     </form>
@@ -422,7 +421,7 @@ export default function OtpTemplatePage(request: any) {
                                 <TableHeader>
                                     <TableRow className="border-b">
                                         <TableHead className="text-left py-2 px-4">API Key</TableHead>
-                                        <TableHead className="text-left py-2 px-4">คำอธิบาย</TableHead>
+                                        <TableHead className="text-left py-2 px-4">Template</TableHead>
                                         <TableHead className="text-left py-2 px-4">สร้างเมื่อ</TableHead>
                                         <TableHead className="text-right py-2 px-4">การกระทำ</TableHead>
                                     </TableRow>

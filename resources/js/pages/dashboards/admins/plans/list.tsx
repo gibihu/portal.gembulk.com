@@ -83,7 +83,7 @@ export default function PlansListPage(request: any) {
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{plan.name}</TableCell>
                                             <TableCell>{plan.status_text}</TableCell>
-                                            <TableCell className="text-right">{plan.order ?? 0}</TableCell>
+                                            <TableCell className="text-right">{plan.orders ?? 0}</TableCell>
                                             <TableCell className="text-right">
                                                 <Link href={web.dashboard.admins.plans.edit(plan.id).url}>
                                                     <Button>

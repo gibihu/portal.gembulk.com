@@ -16,9 +16,14 @@ use PhpParser\Node\Stmt\Return_;
 
 class WebDashPageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('dashboards/index');
+        $user = $request->user();
+        if(!empty($user->plan_id) || $user->credits == 0){
+            return Inertia::render('dashboards/plans/index');
+        }else{
+            return Inertia::render('dashboards/senders/add');
+        }
     }
 
     public function smsAdd()
@@ -62,7 +67,11 @@ class WebDashPageController extends Controller
     public function apiIndex(Request $request)
     {
         $apiKeys = $request->user()->load('apiKeys')->apiKeys;
-        return Inertia::render('dashboards/otp/templates/add', compact('apiKeys'));
+        return Inertia::render('dashboards/apis/add', compact('apiKeys'));
+    }
+    public function apiDocs(Request $request)
+    {
+        return Inertia::render('dashboards/apis/docs/index');
     }
 
     public function plansIndex()

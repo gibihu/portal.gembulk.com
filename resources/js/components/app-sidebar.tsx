@@ -78,6 +78,12 @@ export function AppSidebar() {
                     href: web.dashboard.api.index().url,
                     icon: KeyRound,
                     isActive: false,
+                    items: [
+                        {
+                            title: "Documentation",
+                            href: web.dashboard.api.docs().url,
+                        },
+                    ]
                 },
             ],
         },
@@ -103,18 +109,6 @@ export function AppSidebar() {
                             href: web.dashboard.admins.plans.index().url,
                             isActive: false,
                             icon: LandPlot,
-                        },
-                        {
-                            title: "รายการพอยต์",
-                            href: "#",
-                            isActive: false,
-                            icon: Layers
-                        },
-                        {
-                            title: "รายงาน",
-                            href: "#",
-                            isActive: false,
-                            icon: Layers,
                         },
                     ],
                 },

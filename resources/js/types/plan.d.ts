@@ -8,7 +8,7 @@ export interface PlanType {
     price: number;
     currency?: string;
     credit_limit: number;
-    order: number;
+    orders: number;
     options?: Record<string, string>;
     custom_plans?: Record<string, string>[];
     duration: number;

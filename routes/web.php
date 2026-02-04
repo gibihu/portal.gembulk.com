@@ -57,10 +57,11 @@ Route::name('web.')->group(function () {
                 });
                 Route::prefix('api')->name('api.')->group(function () {
                     Route::get('/', 'apiIndex')->name('index');
+                    Route::get('docs', 'apiDocs')->name('docs');
                 });
             });
 
-            Route::controller(WebDashAdminPageController::class)->prefix('admins')->name('admins.')->group(function () {
+            Route::middleware('role:admin')->controller(WebDashAdminPageController::class)->prefix('admins')->name('admins.')->group(function () {
                 Route::prefix('senders')->name('senders.')->group(function () {
                     Route::get('requests', 'senderRequests')->name('requests');
                 });

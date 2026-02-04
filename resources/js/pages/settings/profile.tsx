@@ -77,6 +77,7 @@ export default function Profile({
                                         type="email"
                                         className="mt-1 block w-full"
                                         defaultValue={auth.user.email}
+                                        disabled={true}
                                         name="email"
                                         required
                                         autoComplete="username"
