@@ -36,7 +36,7 @@ class PaymentApiController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'ผู้ให้บริการปิดปรับปุง',
-                    'description' => 'งดทำรายการช่วง 22:00 - 02:00 น.',
+                    'description' => 'งดทำรายการช่วง 22:30 - 02:00 น.',
                     'code' => 503,
                 ], 503);
             }
