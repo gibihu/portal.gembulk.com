@@ -74,9 +74,21 @@ class WebDashPageController extends Controller
         return Inertia::render('dashboards/apis/docs/index');
     }
 
-    public function plansIndex()
+    public function plansIndex(Request $request)
     {
-        return Inertia::render('dashboards/plans/index');
+        $user = $request->user();
+        $plan = Plan::find($user->plan_id);
+        return Inertia::render('dashboards/plans/index', compact('plan'));
+    }
+    public function plansManage(Request $request)
+    {
+        $user = $request->user();
+        if(!empty($user->plan_id)){
+            $plan = Plan::find($user->plan_id);
+            return Inertia::render('dashboards/plans/manage', compact('plan'));
+        }else{
+            return redirect()->route('web.dashboard.plans.index');
+        }
     }
 
     public function plansPayment(Request $request, $id)

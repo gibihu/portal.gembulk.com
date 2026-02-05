@@ -8,7 +8,7 @@ use App\Http\Controllers\Tests\CronjobTestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware('throttle:10,1')->name('web.')->group(function () {
+Route::middleware('throttle:30,1')->name('web.')->group(function () {
 
     Route::controller(AuthController::class)->group(function () {
         Route::prefix('login')->name('login.')->group(function () {
@@ -52,6 +52,7 @@ Route::middleware('throttle:10,1')->name('web.')->group(function () {
                 });
                 Route::prefix('plans')->name('plans.')->group(function () {
                     Route::get('/', 'plansIndex')->name('index');
+                    Route::get('/manage', 'plansManage')->name('manage');
                     Route::get('/pay/{id}', 'plansPayment')->name('payment');
                     Route::get('/{id}', 'preview')->name('preview');
                 });
@@ -78,6 +79,10 @@ Route::middleware('throttle:10,1')->name('web.')->group(function () {
                     Route::get('/', 'plansIndex')->name('index');
                     Route::get('add', 'plansAdd')->name('add');
                     Route::get('edit/{id}', 'plansEdit')->name('edit');
+                });
+
+                Route::prefix('users')->name('users.')->group(function () {
+                    Route::get('/', 'usersIndex')->name('index');
                 });
             });
         });

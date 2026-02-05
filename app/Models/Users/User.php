@@ -41,7 +41,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
-            'roles' => 'array',
         ];
     }
 
@@ -67,9 +66,23 @@ class User extends Authenticatable
 //    แปลงกลับตอนบันทึก
     public function setRolesAttribute($value)
     {
+        // ถ้าส่งมาเป็น name → แปลงเป็น id
         if (is_array($value)) {
-            $this->attributes['roles'] = json_encode($value);
+
+            // ถ้าเป็นตัวเลขอยู่แล้ว
+            if (is_numeric($value[0] ?? null)) {
+                $ids = $value;
+            } else {
+                // เป็นชื่อ role
+                $ids = Role::whereIn('name', $value)
+                    ->pluck('id')
+                    ->toArray();
+            }
+
+            $this->attributes['roles'] = json_encode($ids);
+
         } else {
+
             $this->attributes['roles'] = json_encode([]);
         }
     }

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound } from 'lucide-react';
+import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound, UsersRound } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavProjects } from './nav-project';
 import web from '@/routes/web';
@@ -92,6 +92,12 @@ export function AppSidebar() {
                 {
                     title: "Administration",
                     items: [
+                        {
+                            title: "User",
+                            href: web.dashboard.admins.users.index().url,
+                            isActive: false,
+                            icon: UsersRound,
+                        },
                         {
                             title: "Server",
                             href: web.dashboard.admins.server.lists().url,

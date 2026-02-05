@@ -17,6 +17,7 @@ class SMSApiController extends Controller
     public function create(Request $request)
     {
         try{
+            $user = $request->user();
             $cp_name = $request->campaign_name ?? '';
             $receivers = $request->receivers;
             $sender_id = $request->sender_id;
@@ -24,7 +25,6 @@ class SMSApiController extends Controller
             $cost = $request->cost;
             $msg = $request->msg;
             $receiver_count = $request->receiver_count;
-            $user = $request->user();
             $scheduled_at = $request->scheduled_at;
             $is_scheduled = $request->is_scheduled;
 

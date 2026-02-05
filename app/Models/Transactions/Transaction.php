@@ -40,7 +40,7 @@ class Transaction extends Model
         'fee'        => 'decimal:2',
         'net_amount' => 'decimal:2',
         'tax'        => 'decimal:2',
-        'tax_invoice'=> 'decimal:2',
+        'tax_invoice'=> 'boolean',
     ];
 
     protected $appends = [
