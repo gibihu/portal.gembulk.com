@@ -13,7 +13,7 @@ use App\Http\Controllers\Apis\Servers\ServerApiController;
 use App\Http\Controllers\Apis\Transactions\TransactionApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'throttle:30,1'])->prefix('api')->name('api.')->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->prefix('api')->name('api.')->group(function () {
 
     Route::controller(SMSApiController::class)->group(function () {
         Route::prefix('sms')->name('sms.')->group(function () {

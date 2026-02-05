@@ -22,11 +22,6 @@ class SendingTableSeeder extends Seeder
     public function run(): void
     {
 
-
-        $role1 = Role::create(['name' => 'user', 'full_name' => 'User']);
-        $role2 = Role::create(['name' => 'admin', 'full_name' => 'Administrator']);
-
-
         $server = Server::create([
             'name' => 'Siam SMS',
             'host' => 'https://member.ac-siam-sms.com',
@@ -276,13 +271,16 @@ class SendingTableSeeder extends Seeder
             $plan = Plan::create($plan);
         }
 
+        $role1 = Role::create(['name' => 'user', 'full_name' => 'User']);
+        $role2 = Role::create(['name' => 'admin', 'full_name' => 'Administrator']);
+
         $user = User::firstOrCreate(
             ['email' => 'a@gmail.com'],
             [
                 'name' => 'Test User',
                 'username' => 'test',
                 'password' => '123456789',
-                'roles' => [$role1->id, $role2->id],
+                'roles' => [$role1->name, $role2->name],
                 'email_verified_at' => now(),
                 'credits' => 10000,
                 'plan_id' => $plan->id,
@@ -291,59 +289,6 @@ class SendingTableSeeder extends Seeder
 
         $server->user_id = $user->id;
         $server->save();
-
-//        Campaign::create([
-//            'name' => 'Test Campaign 1',
-//            'action_key' => 'sms',
-//            'receivers' => ['66924187401'],
-//            'message' => 'Test',
-//            'data' => [
-//                'cost' => 1,
-//                'real_cost' => 1,
-//                'receiver_count' => 1,
-//            ],
-//            'total_cost' => 1,
-//            'status' => Campaign::STATUS_PENDING,
-//            'sender_name' => $sender->name,
-//            'sender_id' => $sender->id,
-//            'server_name' => $server->name,
-//            'server_id' => $server->id,
-//            'user_id' => $user->id,
-//            'scheduled_at' => null,
-//        ]);
-//        $campaign = Campaign::create([
-//            'name' => 'Test Campaign 2',
-//            'action_key' => 'sms',
-//            'receivers' => ['66924187401'],
-//            'message' => 'Test Message',
-//            'data' => [
-//                'cost' => 2,
-//                'real_cost' => 2,
-//                'receiver_count' => 1,
-//            ],
-//            'total_cost' => 2,
-//            'status' => Campaign::STATUS_PENDING,
-//            'sender_name' => $sender->name,
-//            'sender_id' => $sender->id,
-//            'server_name' => $server->name,
-//            'server_id' => $server->id,
-//            'user_id' => $user->id,
-//            'scheduled_at' => null,
-//        ]);
-//
-//        foreach ($campaign->receivers as $receiver) {
-//            $sending = CampaignReceiver::create([
-//                'receiver' => $receiver,
-//                'message' => $campaign->message,
-//                'sender_name' => $sender->name,
-//                'cost' => 2,
-//                'action_key' => 'sms',
-//                'campaign_id' => $campaign->id,
-//                'status' => CampaignReceiver::STATUS_PENDING,
-//            ]);
-//        }
-
-
         $words = [
             "พนัน", "หวย", "เดิมพัน", "บาคาร่า", "สล็อต", "ยิงปลา", "มวย", "แทง", "ยิง", "นายก",
             "รัฐบาล", "หนังโป๊", "xxx", "เย็ด", "รูปโป๊", "คลิปโป๊", "แทงบอลออนไลน์",

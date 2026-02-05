@@ -59,17 +59,19 @@ export default function Page(request: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                <Card className='col-span-1 md:col-span-2 px-4'>
-                    {selectedUser ? (
-                        <UserInfo data={selectedUser} onchange={handleUserUpdate} />
-                    ) : (
-                        <div className="w-full h-full flex justify-center items-center border border-dashed rounded-lg">
-                            <span className='text-muted-foreground my-12'>เลือกผู้ใช้</span>
-                        </div>
-                    )}
-                </Card>
-                <Card className='col-span-1 md:col-span-4'>
+            <div className="flex flex-col lg:flex-row gap-4 ">
+                <div className="w-full lg:w-2/6">
+                    <Card className='p-4'>
+                        {selectedUser ? (
+                            <UserInfo data={selectedUser} onchange={handleUserUpdate} />
+                        ) : (
+                            <div className="w-full h-full flex justify-center items-center border border-dashed rounded-lg py-12">
+                                <span className='text-muted-foreground'>เลือกผู้ใช้</span>
+                            </div>
+                        )}
+                    </Card>
+                </div>
+                <Card className='flex-1'>
                     <CardHeader></CardHeader>
                     <CardContent>
                         <Table>
