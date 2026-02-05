@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sendings\Plan;
 use App\Models\Sendings\Sender;
 use App\Models\Sendings\Servers\Server;
+use App\Models\Users\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -67,6 +68,11 @@ class WebDashAdminPageController extends Controller
     {
         $plan = plan::find($id);
         return Inertia::render('dashboards/admins/plans/add', compact('plan'));
+    }
+
+    public function usersIndex(Request $request)
+    {
+        return Inertia::render('dashboards/admins/users/list');
     }
 
 }

@@ -50,7 +50,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 <DropdownMenuItem asChild>
                     <Link
                         className="block w-full"
-                        href={web.dashboard.plans.index()}
+                        href={web.dashboard.plans.manage()}
                         as="button"
                         prefetch
                         onClick={cleanup}

@@ -469,7 +469,7 @@ function ActionSendCard({
                                     name={`actions.${actionIndex}.endpoint`}
                                     render={({ field, fieldState }: any) => (
                                         <FormItem className="col-span-2 flex flex-col items-start">
-                                            <FormLabel>ลิงก์หรือที่อยู่เซิฟเวอร์</FormLabel>
+                                            <FormLabel>Endpoint</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="https://domain.com/*" disabled={isFetch} {...field}></Input>
                                             </FormControl>
