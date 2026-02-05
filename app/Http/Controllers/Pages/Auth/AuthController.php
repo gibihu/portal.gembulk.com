@@ -51,6 +51,7 @@ class AuthController extends Controller
             'roles' => Role::where('name', 'user')->pluck('id')->toArray(),
         ]);
         $user = User::create($data);
+        Auth::login($user);
 
         return redirect()->route('web.home');
     }

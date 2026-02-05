@@ -1,9 +1,10 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Users;
 
+use App\Models\Users\Role;
+use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Users\User>
@@ -14,6 +15,7 @@ class UserFactory extends Factory
      * The current password being used by the factory.
      */
     protected static ?string $password;
+    protected $model = User::class;
 
     /**
      * Define the model's default state.
@@ -22,15 +24,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $roles = Role::pluck('id')->toArray();
         return [
             'name' => fake()->name(),
+            'username' => fake()->unique()->username(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= 'password',
-            'remember_token' => Str::random(10),
-            'two_factor_secret' => Str::random(10),
-            'two_factor_recovery_codes' => Str::random(10),
-            'two_factor_confirmed_at' => now(),
+            'roles' => $roles,
+            'credits' => 0,
         ];
     }
 

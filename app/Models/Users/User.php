@@ -5,11 +5,12 @@ namespace App\Models\Users;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Sendings\Plan;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
     protected $table = 'users';
     protected $keyType = 'string';
     public $incrementing = false;
