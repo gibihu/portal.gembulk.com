@@ -126,8 +126,8 @@ export default function PlanPaymentPage(request: any) {
                 </div>
                 <Card>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                            <div className="col-span-1 md:col-span-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+                            <div className="col-span-1 lg:col-span-4">
                                 <Card className="p-0">
                                     <CardContent className="p-4">
                                         <Table>
@@ -148,7 +148,7 @@ export default function PlanPaymentPage(request: any) {
                             </div>
 
 
-                            <div className="col-span-1 md:col-span-2 flex flex-col gap-4">
+                            <div className="col-span-1 lg:col-span-2 flex flex-col gap-4">
                                 <Card>
                                     <CardHeader>
                                         <h1 className="text-xl font-bold">
