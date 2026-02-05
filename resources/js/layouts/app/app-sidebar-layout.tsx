@@ -12,7 +12,7 @@ export default function AppSidebarLayout({
     return (
         <AppShell variant="sidebar">
             <AppSidebar />
-            <AppContent variant="sidebar" className="pr-2 overflow-x-hidden bg-transparent mt-2 overflow-y-hidden min-h-full">
+            <AppContent variant="sidebar" className="pl-2 md:pl-0 pr-2 overflow-x-hidden bg-transparent mt-2 overflow-y-hidden min-h-full">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 <div className="my-4 p-4 bg-background/50 rounded-2xl shadow-xl">
                     {children}
