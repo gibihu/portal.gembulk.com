@@ -5,17 +5,25 @@ namespace App\Http\Controllers\Pages\Dashs;
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\CampaignReceiver;
 use App\Models\Sendings\Campaign;
+use App\Models\Sendings\Plan;
 use App\Models\Sendings\Servers\Server;
 use App\Models\Sendings\SpamWord;
+use App\Models\Users\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use PhpParser\Node\Stmt\Return_;
 
 class WebDashPageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('dashboards/index');
+        $user = $request->user();
+        if(!empty($user->plan_id) || $user->credits == 0){
+            return Inertia::render('dashboards/plans/index');
+        }else{
+            return Inertia::render('dashboards/senders/add');
+        }
     }
 
     public function smsAdd()
@@ -56,13 +64,24 @@ class WebDashPageController extends Controller
         return Inertia::render('dashboards/senders/add', compact('sender'));
     }
 
-    public function templateOTP(Request $request)
+    public function apiIndex(Request $request)
     {
-        $server_id = $request->user()->plan->servers[0];
-        $server = [
-            'id' => $server_id,
-        ];
+        $apiKeys = $request->user()->load('apiKeys')->apiKeys;
+        return Inertia::render('dashboards/apis/add', compact('apiKeys'));
+    }
+    public function apiDocs(Request $request)
+    {
+        return Inertia::render('dashboards/apis/docs/index');
+    }
 
-        return Inertia::render('dashboards/otp/templates/add', compact('server'));
+    public function plansIndex()
+    {
+        return Inertia::render('dashboards/plans/index');
+    }
+
+    public function plansPayment(Request $request, $id)
+    {
+        $plan = Plan::findOrFail($id);
+        return Inertia::render('dashboards/plans/payment', compact('plan'));
     }
 }

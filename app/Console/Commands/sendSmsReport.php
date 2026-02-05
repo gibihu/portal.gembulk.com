@@ -35,20 +35,17 @@ class sendSmsReport extends Command
             $limit = 50;
 
             Campaign::where('status', Campaign::STATUS_UNDER_REVIEW)
+                ->where('action_key', 'sms')
                 ->limit($limit)
                 ->cursor()
                 ->each(function ($item) {
                     Log::channel('sms_report')->info('--> Processing "' . $item->name . '"');
-                    if ($item->action_key === 'sms') {
-                        Log::channel('sms_report')->info('--> Action Is "' . $item->action_key . '"');
-
-                        $item = ActionServerHelper::ActionReportSMS($item);
-                        if($item !== false){
-                            $item->save();
-                            Log::channel('sms_report')->info('--> Action completed');
-                        }else{
-                            Log::channel('sms_report')->error('--> Cannot send SMS Report');
-                        }
+                    $item = ActionServerHelper::ActionReportSMS($item);
+                    if($item !== false){
+                        $item->save();
+                        Log::channel('sms_report')->info('--> Action completed');
+                    }else{
+                        Log::channel('sms_report')->error('--> Cannot send SMS Report');
                     }
                 }
                 );

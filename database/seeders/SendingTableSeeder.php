@@ -9,6 +9,7 @@ use App\Models\Sendings\Sender;
 use App\Models\Sendings\Servers\Server;
 use App\Models\Sendings\Servers\ServerAction;
 use App\Models\Sendings\SpamWord;
+use App\Models\Transactions\Provider;
 use App\Models\Users\Role;
 use App\Models\Users\User;
 use Illuminate\Database\Seeder;
@@ -102,7 +103,7 @@ class SendingTableSeeder extends Seeder
                 "server_id" => $server->id,
                 "action_key" => "otp",
                 "method" => "POST",
-                "endpoint" => "",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/send",
                 "headers" => [
                     "Content-Type" => "application/json",
                     "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
@@ -113,11 +114,11 @@ class SendingTableSeeder extends Seeder
                         "isArray" => false
                     ],
                     [
-                        "sender" => null,
+                        "sender" => "sender_name",
                         "isArray" => false
                     ],
                     [
-                        "receiver" => null,
+                        "receivers" => "phone_numbers",
                         "isArray" => false
                     ],
                     [
@@ -126,9 +127,10 @@ class SendingTableSeeder extends Seeder
                     ]
                 ],
                 "response" => [
-                    "status" => "success",
+                    "success" => "success",
                     "message" => "message",
-                    "ref_id" => "campaign_id"
+                    "ref_id" => "campaign_id",
+                    "credits" => "credits",
                 ],
                 "settings" => null,
                 "status" => 0,
@@ -136,38 +138,33 @@ class SendingTableSeeder extends Seeder
             [
                 "server_id" => $server->id,
                 "action_key" => "otp_report",
-                "method" => "POST",
-                "endpoint" => "",
+                "method" => "GET",
+                "endpoint" => "https://api.ac-siam-sms.com/api/smsapi/report",
                 "headers" => [
                     "Content-Type" => "application/json",
                     "x-api-key" => "XC-8zKnQ9dumyq16UbtJEml1ks_mOXyu",
                 ],
                 "body" => [
                     [
-                        "message" => "message",
+                        "ref_id" => "campaign_id",
                         "isArray" => false
                     ],
-                    [
-                        "sender" => null,
-                        "isArray" => false
-                    ],
-                    [
-                        "receiver" => null,
-                        "isArray" => false
-                    ],
-                    [
-                        "scheduled_at" => "false",
-                        "isArray" => false
-                    ]
                 ],
                 "response" => [
-                    "status" => "success",
                     "message" => "message",
-                    "ref_id" => "campaign_id"
+                    "credits_refund" => "campaigns.0.credits_refund",
+                    "total_receiver" => "campaigns.0.all_numbers",
+                    "passed" => "campaigns.0.success",
+                    "sent" => "campaigns.0.sent",
+                    "failed" => "campaigns.0.failed",
+                    "pending" => "campaigns.0.pending",
+                    "sender_name" => "campaigns.0.sender_name",
+                    "ref_id" => "campaigns.0.id",
+                    "campaign_name" => "campaigns.0.campaign_name",
                 ],
                 "settings" => null,
                 "status" => 0,
-            ]
+            ],
         ];
 
         foreach ($server_actions_data as $action) {
@@ -219,12 +216,65 @@ class SendingTableSeeder extends Seeder
             $sender = Sender::create($item);
         }
 
-        $plan = Plan::create([
-            'name' => 'Starter Set',
-            'servers' => [$server->id],
-            'price' => 100,
-            'credits' => 1500,
-        ]);
+        $plans = [
+            [
+                'name' => 'Starter',
+                'servers' => [$server->id],
+                'price' => 1000,
+                'credit_limit' => 3030,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 3,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.33,
+            ],
+            [
+                'name' => 'Basic',
+                'servers' => [$server->id],
+                'price' => 10000,
+                'credit_limit' => 35741,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 6,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.28,
+            ],
+            [
+                'name' => 'Corporate',
+                'description' => 'รายละเอียกจำลอง',
+                'servers' => [$server->id],
+                'price' => 50000,
+                'credit_limit' => 208333,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 6,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.24,
+                'recommended' => true,
+                'tax_rate' => 0.07,
+            ],
+            [
+                'name' => 'Corporate Special',
+                'servers' => [$server->id],
+                'price' => 100000,
+                'credit_limit' => 500000,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 12,
+                'duration_unit' => Plan::DURATION_UNIT_MONTHS,
+                'more_than' => 0.2,
+            ],
+            [
+                'name' => 'Enterprise',
+                'servers' => [$server->id],
+                'price' => 300000,
+                'credit_limit' => 1666667,
+                'status' => Plan::STATUS_PUBLISHED,
+                'duration' => 999,
+                'duration_unit' => Plan::DURATION_UNIT_LIFETIME,
+                'more_than' => 0.18,
+            ]
+        ];
+
+        foreach ($plans as $plan) {
+            $plan = Plan::create($plan);
+        }
 
         $user = User::firstOrCreate(
             ['email' => 'a@gmail.com'],
@@ -233,65 +283,64 @@ class SendingTableSeeder extends Seeder
                 'username' => 'test',
                 'password' => '123456789',
                 'roles' => [$role1->id, $role2->id],
-                'plan_id' => $plan->id,
                 'email_verified_at' => now(),
-                'credits' => 1000000,
+                'credits' => 0,
             ]
         );
 
         $server->user_id = $user->id;
         $server->save();
 
-        Campaign::create([
-            'name' => 'Test Campaign 1',
-            'action_key' => 'sms',
-            'receivers' => ['66924187401'],
-            'message' => 'Test',
-            'data' => [
-                'cost' => 1,
-                'real_cost' => 1,
-                'phone_counts' => 1,
-            ],
-            'total_cost' => 1,
-            'status' => Campaign::STATUS_PENDING,
-            'sender_name' => $sender->name,
-            'sender_id' => $sender->id,
-            'server_name' => $server->name,
-            'server_id' => $server->id,
-            'user_id' => $user->id,
-            'scheduled_at' => null,
-        ]);
-        $campaign = Campaign::create([
-            'name' => 'Test Campaign 2',
-            'action_key' => 'sms',
-            'receivers' => ['66924187401'],
-            'message' => 'Test Message',
-            'data' => [
-                'cost' => 2,
-                'real_cost' => 2,
-                'phone_counts' => 1,
-            ],
-            'total_cost' => 2,
-            'status' => Campaign::STATUS_PENDING,
-            'sender_name' => $sender->name,
-            'sender_id' => $sender->id,
-            'server_name' => $server->name,
-            'server_id' => $server->id,
-            'user_id' => $user->id,
-            'scheduled_at' => null,
-        ]);
-
-        foreach ($campaign->receivers as $receiver) {
-            $sending = CampaignReceiver::create([
-                'receiver' => $receiver,
-                'message' => $campaign->message,
-                'sender_name' => $sender->name,
-                'cost' => 2,
-                'action_key' => 'sms',
-                'campaign_id' => $campaign->id,
-                'status' => CampaignReceiver::STATUS_PENDING,
-            ]);
-        }
+//        Campaign::create([
+//            'name' => 'Test Campaign 1',
+//            'action_key' => 'sms',
+//            'receivers' => ['66924187401'],
+//            'message' => 'Test',
+//            'data' => [
+//                'cost' => 1,
+//                'real_cost' => 1,
+//                'receiver_count' => 1,
+//            ],
+//            'total_cost' => 1,
+//            'status' => Campaign::STATUS_PENDING,
+//            'sender_name' => $sender->name,
+//            'sender_id' => $sender->id,
+//            'server_name' => $server->name,
+//            'server_id' => $server->id,
+//            'user_id' => $user->id,
+//            'scheduled_at' => null,
+//        ]);
+//        $campaign = Campaign::create([
+//            'name' => 'Test Campaign 2',
+//            'action_key' => 'sms',
+//            'receivers' => ['66924187401'],
+//            'message' => 'Test Message',
+//            'data' => [
+//                'cost' => 2,
+//                'real_cost' => 2,
+//                'receiver_count' => 1,
+//            ],
+//            'total_cost' => 2,
+//            'status' => Campaign::STATUS_PENDING,
+//            'sender_name' => $sender->name,
+//            'sender_id' => $sender->id,
+//            'server_name' => $server->name,
+//            'server_id' => $server->id,
+//            'user_id' => $user->id,
+//            'scheduled_at' => null,
+//        ]);
+//
+//        foreach ($campaign->receivers as $receiver) {
+//            $sending = CampaignReceiver::create([
+//                'receiver' => $receiver,
+//                'message' => $campaign->message,
+//                'sender_name' => $sender->name,
+//                'cost' => 2,
+//                'action_key' => 'sms',
+//                'campaign_id' => $campaign->id,
+//                'status' => CampaignReceiver::STATUS_PENDING,
+//            ]);
+//        }
 
 
         $words = [
@@ -306,5 +355,12 @@ class SendingTableSeeder extends Seeder
         foreach ($words as $w) {
             SpamWord::create(['word' => $w]);
         }
+
+        Provider::create([
+            'name' => 'p2wpay',
+            'code' => 'p2wpay',
+            'host' => 'p2wpay.com',
+            'status' => Provider::STATUS_ACTIVE,
+        ]);
     }
 }

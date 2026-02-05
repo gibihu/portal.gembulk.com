@@ -1,6 +1,7 @@
 import { status } from './../routes/api/senders/index';
 import { actions } from './../routes/api/admins/senders/requests/index';
 import { standing } from './../../../../livescore-app/resources/js/routes/test/index';
+import { PlanType } from './plan';
 export interface UserType {
     id: string;
     name: string;
@@ -10,42 +11,18 @@ export interface UserType {
     credits: number;
     senders?: string[];
     plan_id?: string;
-    plan: PlanType;
+    plan: PlanType | null;
     roles: string[];
     avatar: string;
     updated_at: string;
     created_at: string;
 }
 
-
-export interface PlanType{
-    id: string;
-    name: string;
-    description: string;
-    details: string;
-    price: number;
-    currency: string;
-    credits: number;
-    orders: number;
-    options: PlanOptionType;
-    custom_plans: string[];
-    duration: number;
-    duration_unit: number;
-    servers: serverType[];
-    updated_at: string;
-    created_at: string;
-}
-
-export interface PlanOptionType {
-
-}
-
-
 export interface ServerType {
     id: string;
     name: string;
     host: string;
-    is_active
+    is_active: boolean;
     senders?: SenderType[] | [];
     user?: UserType;
     actions?: ServerActionType[] | [];

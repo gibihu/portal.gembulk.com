@@ -12,11 +12,12 @@ class PlansApiController extends Controller
     public function index(Request $request)
     {
         try{
-            $query = $request->query();
-            $one_or_many = $query->q;
-            $filter = $query->filter;
-            $plans = Plan::query();
-            dd($one_or_many, $filter, $plans, $query, $request->all());
+            $plans = Plan::where('status', Plan::STATUS_PUBLISHED)->get();
+            return response()->json([
+                'message' => 'Success',
+                'data' => $plans,
+                'code' => 200
+            ], 200);
         }catch (Exception $e) {
             $response = [
                 'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',

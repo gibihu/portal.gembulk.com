@@ -8,7 +8,7 @@ use App\Http\Controllers\Tests\CronjobTestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::name('web.')->group(function () {
+Route::middleware('throttle:10,1')->name('web.')->group(function () {
 
     Route::controller(AuthController::class)->group(function () {
         Route::prefix('login')->name('login.')->group(function () {
@@ -24,7 +24,7 @@ Route::name('web.')->group(function () {
             Route::get('/', 'index')->name('home');
         });
 
-        Route::prefix('dashboard')->name('dash.')->group(function () {
+        Route::prefix('dashboard')->name('dashboard.')->group(function () {
             Route::controller(WebDashPageController::class)->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::prefix('senders')->name('senders.')->group(function () {
@@ -48,11 +48,20 @@ Route::name('web.')->group(function () {
                     Route::get('reports', 'reportCampaigns')->name('reports');
                 });
                 Route::prefix('otp')->name('otp.')->group(function () {
-                    Route::get('template', 'templateOTP')->name('template');
+//                    Route::get('template', 'templateOTP')->name('template');
+                });
+                Route::prefix('plans')->name('plans.')->group(function () {
+                    Route::get('/', 'plansIndex')->name('index');
+                    Route::get('/pay/{id}', 'plansPayment')->name('payment');
+                    Route::get('/{id}', 'preview')->name('preview');
+                });
+                Route::prefix('api')->name('api.')->group(function () {
+                    Route::get('/', 'apiIndex')->name('index');
+                    Route::get('docs', 'apiDocs')->name('docs');
                 });
             });
 
-            Route::controller(WebDashAdminPageController::class)->prefix('admin')->name('admin.')->group(function () {
+            Route::middleware('role:admin')->controller(WebDashAdminPageController::class)->prefix('admins')->name('admins.')->group(function () {
                 Route::prefix('senders')->name('senders.')->group(function () {
                     Route::get('requests', 'senderRequests')->name('requests');
                 });
@@ -63,6 +72,12 @@ Route::name('web.')->group(function () {
                         Route::get('{id}', 'serverStoreEdit')->name('edit');
                     });
                     Route::get('lists', 'serverLists')->name('lists');
+                });
+
+                Route::prefix('plans')->name('plans.')->group(function () {
+                    Route::get('/', 'plansIndex')->name('index');
+                    Route::get('add', 'plansAdd')->name('add');
+                    Route::get('edit/{id}', 'plansEdit')->name('edit');
                 });
             });
         });
@@ -76,9 +91,13 @@ Route::controller(CronjobTestController::class)->prefix('test')->name('test.')->
                 Route::get('/', 'sendingSMS')->name('index');
                 Route::get('reports', 'ReportSMS')->name('reports');
             });
+            Route::prefix('otp')->name('otp.')->group(function () {
+                Route::get('/report', 'ReportOTP')->name('index');
+            });
         });
     });
 });
 
 require __DIR__.'/settings.php';
+require __DIR__.'/apis/index.php';
 require __DIR__.'/apis/auth.php';

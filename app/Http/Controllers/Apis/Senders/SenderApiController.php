@@ -11,6 +11,24 @@ use Throwable;
 
 class SenderApiController extends Controller
 {
+
+//    public function index(Request $request)
+//    {
+//        try{
+//
+//        } catch (Exception $e) {
+//            $response = [
+//                'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
+//                'description' => $e->getMessage() ?? '',
+//                'code' => 500,
+//            ];
+//            if (config('app.debug')) $response['debug'] = [
+//                'message' => $e->getMessage() ?? '',
+//                'request' => $request->all(),
+//            ];
+//            return response()->json($response, 500);
+//        }
+//    }
     public function senderRequest(Request $request)
     {
         try {

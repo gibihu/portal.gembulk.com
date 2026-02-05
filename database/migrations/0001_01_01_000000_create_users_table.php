@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('password');
 
             $table->bigInteger('credits')->default(0);
-            $table->char('plan_id', 36)->nullable();
+            $table->uuid('plan_id')->index()->nullable();
 
             $table->json('roles')->nullable();
 

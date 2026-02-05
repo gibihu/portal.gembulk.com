@@ -12,7 +12,7 @@ import web from "@/routes/web";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่งแล้ว',
-        href: web.dash.report.sms().url,
+        href: web.dashboard.report.sms().url,
     },
 ];
 

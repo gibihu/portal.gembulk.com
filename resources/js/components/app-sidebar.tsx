@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck } from 'lucide-react';
+import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavProjects } from './nav-project';
 import web from '@/routes/web';
@@ -22,7 +22,7 @@ import { check } from 'node_modules/zod/v4/classic/external.cjs';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: web.dash.index(),
+        href: web.dashboard.index(),
         icon: LayoutGrid,
     },
 ];
@@ -51,33 +51,39 @@ export function AppSidebar() {
             items: [
                 {
                     title: "Sender",
-                    href: web.dash.senders.add().url,
+                    href: web.dashboard.senders.add().url,
                     icon: Ticket,
                     isActive: false,
                 },
                 {
                     title: "SMS",
-                    href: web.dash.sending.sms.add().url,
-                    icon: Notebook,
-                    isActive: false,
-                },
-                {
-                    title: "OTP Template",
-                    href: web.dash.otp.template.url(),
+                    href: web.dashboard.sending.sms.add().url,
                     icon: Notebook,
                     isActive: false,
                 },
                 {
                     title: "Jobs",
-                    href: web.dash.jobs.sms().url,
+                    href: web.dashboard.jobs.sms().url,
                     icon: Bot,
                     isActive: false,
                 },
                 {
                     title: "Reports",
-                    href: web.dash.campaigns.reports().url,
+                    href: web.dashboard.campaigns.reports().url,
                     icon: Layers,
                     isActive: false,
+                },
+                {
+                    title: "Api",
+                    href: web.dashboard.api.index().url,
+                    icon: KeyRound,
+                    isActive: false,
+                    items: [
+                        {
+                            title: "Documentation",
+                            href: web.dashboard.api.docs().url,
+                        },
+                    ]
                 },
             ],
         },
@@ -88,33 +94,21 @@ export function AppSidebar() {
                     items: [
                         {
                             title: "Server",
-                            href: web.dash.admin.server.lists().url,
+                            href: web.dashboard.admins.server.lists().url,
                             icon: Server,
                             isActive: false,
                         },
                         {
                             title: "อนุมัติผู้ส่ง",
-                            href: web.dash.admin.senders.requests().url,
-                            isActive: true,
+                            href: web.dashboard.admins.senders.requests().url,
+                            isActive: false,
                             icon: TicketCheck
                         },
                         {
-                            title: "ทีเด็ดทั้งหมด",
-                            href: "#",
-                            isActive: true,
-                            icon: Layers,
-                        },
-                        {
-                            title: "รายการพอยต์",
-                            href: "#",
-                            isActive: true,
-                            icon: Layers
-                        },
-                        {
-                            title: "รายงาน",
-                            href: "#",
-                            isActive: true,
-                            icon: Layers,
+                            title: "Plans",
+                            href: web.dashboard.admins.plans.index().url,
+                            isActive: false,
+                            icon: LandPlot,
                         },
                     ],
                 },
@@ -129,7 +123,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={web.dash.index()} prefetch>
+                            <Link href={web.dashboard.index()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

@@ -63,6 +63,18 @@ class Server extends Model
             ->where('action_key', 'sms_report')
             ->first();
     }
+    public function getActionOtpAttribute()
+    {
+        return $this->actions()
+            ->where('action_key', 'otp')
+            ->first();
+    }
+    public function getActionReportOtpAttribute()
+    {
+        return $this->actions()
+            ->where('action_key', 'otp_report')
+            ->first();
+    }
 
     public function user()
     {

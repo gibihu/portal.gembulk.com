@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'p2wpay' => [
+        'key' => env('P2WPAY_KEY'),
+    ]
+
 ];

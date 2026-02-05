@@ -7,12 +7,10 @@ use App\Models\Sendings\Plan;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
     protected $table = 'users';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -43,26 +41,36 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
-            'roles' => 'json',
+            'roles' => 'array',
         ];
     }
 
     protected $with = [];
+    protected $appends = [
+    ];
 
     public function plan()
     {
         return $this->belongsTo(Plan::class, 'plan_id', 'id');
     }
 
+    public function apiKeys()
+    {
+        return $this->hasMany(ApiKey::class);
+    }
 //    แปลงเป็นข้อความ
     public function getRolesAttribute($value)
     {
         $ids = json_decode($value, true) ?? [];
-        return Role::whereIn('id', $ids)->pluck('name');
+        return Role::whereIn('id', $ids)->pluck('name')->toArray();
     }
 //    แปลงกลับตอนบันทึก
     public function setRolesAttribute($value)
     {
-        $this->attributes['roles'] = json_encode($value);
+        if (is_array($value)) {
+            $this->attributes['roles'] = json_encode($value);
+        } else {
+            $this->attributes['roles'] = json_encode([]);
+        }
     }
 }

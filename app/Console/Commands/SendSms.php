@@ -42,6 +42,7 @@ class SendSms extends Command
         try {
             $limit = 50;
             $count = Campaign::where('status', Campaign::STATUS_PENDING)
+                ->where('action_key', strtolower($action_key_upper))
                 ->limit($limit)
                 ->count();
             Log::channel('sms_sent')->info('--> Found ' . $count . ' pending campaigns' . ' Limit ' . $limit);
@@ -50,6 +51,7 @@ class SendSms extends Command
             }
 
             Campaign::where('status', Campaign::STATUS_PENDING)
+                ->where('action_key', strtolower($action_key_upper))
                 ->limit($limit)
                 ->cursor()
                 ->each(function ($item) {
@@ -86,13 +88,11 @@ class SendSms extends Command
                     }
 
                     try {
-                        if ($item->action_key === 'sms') {
-                            Log::channel('sms_sent')->info('--> Action Is "sms"');
-                            $item = $item->fresh();
-                            $item = ActionServerHelper::ActionSMS($item);
-                            $item->save();
-                            Log::channel('sms_sent')->info('--> Action completed');
-                        }
+                        Log::channel('sms_sent')->info('--> Action Is "sms"');
+                        $item = $item->fresh();
+                        $item = ActionServerHelper::ActionSMS($item);
+                        $item->save();
+                        Log::channel('sms_sent')->info('--> Action completed');
 
                     } catch (\Throwable $e) {
 

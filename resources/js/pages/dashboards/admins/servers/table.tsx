@@ -42,7 +42,7 @@ import { toast } from "sonner";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ทำงาน',
-        href: web.dash.jobs.sms().url,
+        href: web.dashboard.jobs.sms().url,
     },
 ];
 
@@ -156,7 +156,7 @@ export default function ServerTable({ items }: { items: any }) {
 
                 return (
                     <div className="flex gap-2 justify-end me-4">
-                        <Link href={web.dash.admin.server.store.edit({ id: row.original.id })} prefetch >
+                        <Link href={web.dashboard.admins.server.store.edit({ id: row.original.id })} prefetch >
                             <Button>
                                 <SquarePen />
                             </Button>
@@ -193,7 +193,7 @@ export default function ServerTable({ items }: { items: any }) {
     return (
         <div className="w-full flex flex-col gap-4">
             <div className="flex items-center justify-end gap-2">
-                <Link href={web.dash.admin.server.store.add().url}>
+                <Link href={web.dashboard.admins.server.store.add().url}>
                     <Button>
                         <Plus />
                     </Button>

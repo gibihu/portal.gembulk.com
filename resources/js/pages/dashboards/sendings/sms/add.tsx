@@ -17,13 +17,12 @@ import { toTimestamp } from "@/lib/timestamp";
 import { GetServerByUser } from "@/models/servers/get";
 import api from "@/routes/api";
 import web from "@/routes/web";
-import campaigns from "@/routes/web/dash/campaigns";
 import { BreadcrumbItem } from "@/types";
-import { PlanType, SenderType, ServerType, UserType } from "@/types/user";
+import { SenderType, ServerType, UserType } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head, router, usePage } from "@inertiajs/react";
 import { addYears } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -32,7 +31,7 @@ import z from "zod";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'ส่ง sms',
-        href: web.dash.sending.sms.add().url,
+        href: web.dashboard.sending.sms.add().url ?? '',
     },
 ];
 export default function SmsAddPage(request: any) {
@@ -63,7 +62,7 @@ export default function SmsAddPage(request: any) {
         sender: z.string().min(1, { message: "ห้ามว่าง" }),
         receivers: z.string().min(1, { message: "ห้ามว่าง" }),
         msg: z.string({ message: "กรุณากรอกข้อความ" }).min(0, { message: "ต้องมีข้อความอย่างน้อย 1 ตัวอักษร" }),
-        phone_counts: z.number(),
+        receiver_count: z.number(),
         is_scheduled: z.boolean(),
         scheduled_date: z.date().optional(),
         scheduled_time: z.string().optional(),
@@ -75,7 +74,7 @@ export default function SmsAddPage(request: any) {
             campaign_name: '',
             sender: servers[0]?.senders?.[0]?.id,
             receivers: '',
-            phone_counts: countReceivers,
+            receiver_count: countReceivers,
             is_scheduled: false,
             scheduled_date: new Date(),
             scheduled_time: now.toTimeString().slice(0, 5),
@@ -92,6 +91,7 @@ export default function SmsAddPage(request: any) {
 
     function submit(data: FormValues) {
         const fetchData = async () => {
+            setIsFetch(true);
             try {
                 const res = await fetch(api.sms.create().url, {
                     method: "POST",
@@ -106,7 +106,7 @@ export default function SmsAddPage(request: any) {
                         msg: data.msg,
                         msg_length: data.msg.length,
                         cost: data.msg.length > 70 ? 2 : 1,
-                        phone_counts: countReceivers,
+                        receiver_count: countReceivers,
                         is_scheduled: data.is_scheduled,
                         scheduled_at: toTimestamp(data.scheduled_date ?? '', data.scheduled_time),
                         campaign_name: data.campaign_name,
@@ -118,7 +118,7 @@ export default function SmsAddPage(request: any) {
                     toast.success(result.message);
                     router.reload();
                     form.reset();
-                    router.visit(web.dash.jobs.sms().url);
+                    router.visit(web.dashboard.jobs.sms().url);
                 } else {
                     toast.error(result.message, { description: result.description ?? '' });
                 }
@@ -334,7 +334,8 @@ export default function SmsAddPage(request: any) {
                         </Card>
 
                         <div className="w-full flex justify-end">
-                            <Button type="submit">
+                            <Button type="submit" disabled={isFetch}>
+                                {isFetch && <Loader className="size-4 animate-spin" />}
                                 บันทึก
                             </Button>
                         </div>

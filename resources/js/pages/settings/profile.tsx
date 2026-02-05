@@ -1,4 +1,3 @@
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
@@ -13,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -77,6 +77,7 @@ export default function Profile({
                                         type="email"
                                         className="mt-1 block w-full"
                                         defaultValue={auth.user.email}
+                                        disabled={true}
                                         name="email"
                                         required
                                         autoComplete="username"
