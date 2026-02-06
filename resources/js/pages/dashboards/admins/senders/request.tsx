@@ -286,7 +286,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                             <div className="font-bold p-2 rounded-t">{item.name}</div>
                                             <Table className="">
                                                 <TableBody>
-                                                    {item.senders && item.senders.length == 0 ? (
+                                                    {item.senders && item.senders.length > 0 ? (
                                                         item.senders.map((sender: SenderType, i: number) => (
                                                             <TableRow key={sender.id || i}>
                                                                 <TableCell>{sender.name}</TableCell>
