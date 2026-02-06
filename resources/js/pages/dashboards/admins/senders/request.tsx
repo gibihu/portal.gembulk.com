@@ -11,7 +11,7 @@ import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { SenderType, ServerType } from "@/types/user";
 import { Head } from "@inertiajs/react";
-import { Check, Loader, Pencil, X } from "lucide-react";
+import { Check, Fullscreen, Loader, Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -88,6 +88,13 @@ export default function Dashboard(request: any) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
+                                {senders.length == 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={3} className="text-muted-foreground text-center italic">
+                                            No senders for this server.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                                 {senders.length > 0 && senders.map((sender: SenderType, key: number) => (
                                     <TableRow key={key}>
                                         <TableCell className="font-medium pl-6">{sender.name}</TableCell>
@@ -261,7 +268,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
         <Card>
             <CardHeader>
                 <span className="text-foreground font-bold text-2xl">
-                    ตารางอนุมัติผู้ส่ง
+                    Senders
                 </span>
             </CardHeader>
             <CardContent>
@@ -271,91 +278,86 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                     </div>
                 ) : (
                     <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Status</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {!isLoading && servers.map((item: ServerType, key: number) => (
-                            <TableRow key={item.id}>
-                                <TableCell colSpan={2} className="p-0 border-0">
-                                    <div className="w-full">
-                                        <div className="font-bold bg-muted p-2 rounded-t">{item.name}</div>
-                                        <Table className="">
-                                            <TableBody>
-                                                {item.senders && item.senders.length > 0 ? (
-                                                    item.senders.map((sender: SenderType, i: number) => (
-                                                        <TableRow key={sender.id || i}>
-                                                            <TableCell>{sender.name}</TableCell>
-                                                            <TableCell>{sender.status_text}</TableCell>
-                                                            <TableCell>
-                                                                <Dialog open={isDialogOpen && editingSender?.id === sender.id} onOpenChange={handleDialogOpenChange}>
-                                                                    <DialogTrigger asChild>
-                                                                        <Button variant="outline" onClick={() => handleEditClick(sender)}>
-                                                                            <Pencil className="size-4" />
-                                                                        </Button>
-                                                                    </DialogTrigger>
-                                                                    <DialogContent>
-                                                                        <DialogHeader>
-                                                                            <DialogTitle>แก้ไขชื่อผู้ส่ง</DialogTitle>
-                                                                            <DialogDescription>
-                                                                                กรุณากรอกชื่อผู้ส่งใหม่
-                                                                            </DialogDescription>
-                                                                        </DialogHeader>
-                                                                        <div className="flex flex-col gap-4 py-4">
-                                                                            <div className="flex flex-col gap-2">
-                                                                                <label className="text-sm font-medium">ชื่อผู้ส่ง</label>
-                                                                                <Input
-                                                                                    value={senderName}
-                                                                                    onChange={(e) => setSenderName(e.target.value)}
-                                                                                    placeholder="กรอกชื่อผู้ส่ง"
-                                                                                    disabled={isUpdating}
-                                                                                />
+                        <TableBody>
+                            {!isLoading && servers.map((item: ServerType, key: number) => (
+                                <TableRow key={item.id}>
+                                    <TableCell colSpan={2} className="p-0 border-0">
+                                        <div className="w-full">
+                                            <div className="font-bold p-2 rounded-t">{item.name}</div>
+                                            <Table className="">
+                                                <TableBody>
+                                                    {item.senders && item.senders.length == 0 ? (
+                                                        item.senders.map((sender: SenderType, i: number) => (
+                                                            <TableRow key={sender.id || i}>
+                                                                <TableCell>{sender.name}</TableCell>
+                                                                <TableCell>{sender.status_text}</TableCell>
+                                                                <TableCell className="flex justify-end">
+                                                                    <Dialog open={isDialogOpen && editingSender?.id === sender.id} onOpenChange={handleDialogOpenChange}>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button variant="outline" onClick={() => handleEditClick(sender)}>
+                                                                                <Pencil className="size-4" />
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <DialogContent>
+                                                                            <DialogHeader>
+                                                                                <DialogTitle>แก้ไขชื่อผู้ส่ง</DialogTitle>
+                                                                                <DialogDescription>
+                                                                                    กรุณากรอกชื่อผู้ส่งใหม่
+                                                                                </DialogDescription>
+                                                                            </DialogHeader>
+                                                                            <div className="flex flex-col gap-4 py-4">
+                                                                                <div className="flex flex-col gap-2">
+                                                                                    <label className="text-sm font-medium">ชื่อผู้ส่ง</label>
+                                                                                    <Input
+                                                                                        value={senderName}
+                                                                                        onChange={(e) => setSenderName(e.target.value)}
+                                                                                        placeholder="กรอกชื่อผู้ส่ง"
+                                                                                        disabled={isUpdating}
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex justify-end gap-2">
+                                                                                    <Button
+                                                                                        variant="outline"
+                                                                                        onClick={() => handleDialogOpenChange(false)}
+                                                                                        disabled={isUpdating}
+                                                                                    >
+                                                                                        ยกเลิก
+                                                                                    </Button>
+                                                                                    <Button
+                                                                                        onClick={handleUpdate}
+                                                                                        disabled={isUpdating || !senderName.trim()}
+                                                                                    >
+                                                                                        {isUpdating ? (
+                                                                                            <>
+                                                                                                <Loader className="animate-spin size-4 mr-2" />
+                                                                                                กำลังอัพเดท...
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            'บันทึก'
+                                                                                        )}
+                                                                                    </Button>
+                                                                                </div>
                                                                             </div>
-                                                                            <div className="flex justify-end gap-2">
-                                                                                <Button
-                                                                                    variant="outline"
-                                                                                    onClick={() => handleDialogOpenChange(false)}
-                                                                                    disabled={isUpdating}
-                                                                                >
-                                                                                    ยกเลิก
-                                                                                </Button>
-                                                                                <Button
-                                                                                    onClick={handleUpdate}
-                                                                                    disabled={isUpdating || !senderName.trim()}
-                                                                                >
-                                                                                    {isUpdating ? (
-                                                                                        <>
-                                                                                            <Loader className="animate-spin size-4 mr-2" />
-                                                                                            กำลังอัพเดท...
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        'บันทึก'
-                                                                                    )}
-                                                                                </Button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </DialogContent>
-                                                                </Dialog>
+                                                                        </DialogContent>
+                                                                    </Dialog>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))
+                                                    ) : (
+                                                        <TableRow>
+                                                            <TableCell className="text-muted-foreground text-center italic">
+                                                                No senders for this server.
                                                             </TableCell>
                                                         </TableRow>
-                                                    ))
-                                                ) : (
-                                                    <TableRow>
-                                                        <TableCell colSpan={2} className="text-muted-foreground italic">
-                                                            No senders for this server.
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                                                    )}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 )}
             </CardContent>
         </Card>
