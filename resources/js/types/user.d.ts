@@ -68,6 +68,9 @@ export interface SenderType {
     id: string;
     user_id: string | null;
     name: string;
+    resource_ids: string[];
+    resource?: string[];
+    content?: string;
     status: number;
     status_text: string;
     server?: ServerType | null;

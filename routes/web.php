@@ -22,6 +22,7 @@ Route::middleware('throttle:60,1')->name('web.')->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::controller(WebDashPageController::class)->group(function () {
             Route::get('/', 'index')->name('home');
+            Route::get('/f/{id}', 'fileView')->name('f');
         });
 
         Route::prefix('dashboard')->name('dashboard.')->group(function () {
