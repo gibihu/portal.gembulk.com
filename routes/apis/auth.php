@@ -59,6 +59,8 @@ Route::middleware(['auth', 'throttle:60,1'])->prefix('api')->name('api.')->group
                 Route::post('/actions', 'senderRequestActions')->name('actions');
                 Route::delete('/destroy', 'destroy')->name('destroy');
             });
+            Route::get('list', 'list')->name('list');
+            Route::post('update', 'update')->name('update');
         });
 
         Route::controller(ServerAdminApiController::class)->prefix('servers')->name('servers.')->group(function () {

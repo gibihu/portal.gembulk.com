@@ -2,16 +2,17 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AppLayout from "@/layouts/app-layout";
 import api from "@/routes/api";
 import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
-import { SenderType } from "@/types/user";
+import { SenderType, ServerType } from "@/types/user";
 import { Head } from "@inertiajs/react";
-import { Check, Loader, X } from "lucide-react";
-import { useState } from "react";
+import { Check, Loader, Pencil, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -72,10 +73,11 @@ export default function Dashboard(request: any) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
             <div className="flex flex-col gap-4">
-                <div className="text-foreground font-bold text-2xl">
-                    ตารางอนุมัติผู้ส่ง
-                </div>
+                <SenderTable csrfToken={csrfToken} />
                 <Card className="p-0 overflow-hidden">
+                    <div className="text-foreground font-bold text-2xl p-4 pb-0">
+                        ตารางอนุมัติผู้ส่ง
+                    </div>
                     <CardContent className="bg-background rounded-2xl p-0">
                         <Table>
                             <TableHeader>
@@ -163,5 +165,199 @@ export default function Dashboard(request: any) {
                 </Card>
             </div>
         </AppLayout>
+    );
+}
+
+
+function SenderTable({ csrfToken }: { csrfToken: string }) {
+    const [servers, setServers] = useState<ServerType[]>([]);
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [editingSender, setEditingSender] = useState<SenderType | null>(null);
+    const [senderName, setSenderName] = useState<string>("");
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const way = api.admins.servers.index();
+                const res = await fetch(way.url);
+                const response = await res.json();
+                if (response.code == 200) {
+                    setServers(response.data);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    const handleEditClick = (sender: SenderType) => {
+        setEditingSender(sender);
+        setSenderName(sender.name);
+        setIsDialogOpen(true);
+    };
+
+    const handleDialogOpenChange = (open: boolean) => {
+        setIsDialogOpen(open);
+        if (!open) {
+            setEditingSender(null);
+            setSenderName("");
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (!editingSender || !senderName.trim()) {
+            toast.error('กรุณากรอกชื่อผู้ส่ง');
+            return;
+        }
+
+        setIsUpdating(true);
+        try {
+            const way = api.admins.senders.update();
+            const res = await fetch(way.url, {
+                method: way.method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
+                body: JSON.stringify({
+                    sender_id: editingSender.id,
+                    name: senderName.trim(),
+                })
+            });
+            const response = await res.json();
+            if (res.ok && response.code === 200) {
+                // อัพเดท state ของ servers
+                setServers(prev =>
+                    prev.map(server => ({
+                        ...server,
+                        senders: server.senders?.map(sender =>
+                            sender.id === editingSender.id
+                                ? { ...sender, name: senderName.trim() }
+                                : sender
+                        ) ?? []
+                    }))
+                );
+                toast.success('อัพเดทชื่อผู้ส่งสำเร็จ');
+                setIsDialogOpen(false);
+                setEditingSender(null);
+                setSenderName("");
+            } else {
+                toast.error(response.message || 'เกิดข้อผิดพลาดในการอัพเดท');
+            }
+        } catch (error) {
+            console.error('Error updating sender:', error);
+            toast.error('เกิดข้อผิดพลาดในการอัพเดท');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+    return (
+        <Card>
+            <CardHeader>
+                <span className="text-foreground font-bold text-2xl">
+                    ตารางอนุมัติผู้ส่ง
+                </span>
+            </CardHeader>
+            <CardContent>
+                {isLoading ? (
+                    <div className="w-full flex justify-center">
+                        <Loader className="size-4 animate-spin" />
+                    </div>
+                ) : (
+                    <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {!isLoading && servers.map((item: ServerType, key: number) => (
+                            <TableRow key={item.id}>
+                                <TableCell colSpan={2} className="p-0 border-0">
+                                    <div className="w-full">
+                                        <div className="font-bold bg-muted p-2 rounded-t">{item.name}</div>
+                                        <Table className="">
+                                            <TableBody>
+                                                {item.senders && item.senders.length > 0 ? (
+                                                    item.senders.map((sender: SenderType, i: number) => (
+                                                        <TableRow key={sender.id || i}>
+                                                            <TableCell>{sender.name}</TableCell>
+                                                            <TableCell>{sender.status_text}</TableCell>
+                                                            <TableCell>
+                                                                <Dialog open={isDialogOpen && editingSender?.id === sender.id} onOpenChange={handleDialogOpenChange}>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button variant="outline" onClick={() => handleEditClick(sender)}>
+                                                                            <Pencil className="size-4" />
+                                                                        </Button>
+                                                                    </DialogTrigger>
+                                                                    <DialogContent>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>แก้ไขชื่อผู้ส่ง</DialogTitle>
+                                                                            <DialogDescription>
+                                                                                กรุณากรอกชื่อผู้ส่งใหม่
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+                                                                        <div className="flex flex-col gap-4 py-4">
+                                                                            <div className="flex flex-col gap-2">
+                                                                                <label className="text-sm font-medium">ชื่อผู้ส่ง</label>
+                                                                                <Input
+                                                                                    value={senderName}
+                                                                                    onChange={(e) => setSenderName(e.target.value)}
+                                                                                    placeholder="กรอกชื่อผู้ส่ง"
+                                                                                    disabled={isUpdating}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex justify-end gap-2">
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    onClick={() => handleDialogOpenChange(false)}
+                                                                                    disabled={isUpdating}
+                                                                                >
+                                                                                    ยกเลิก
+                                                                                </Button>
+                                                                                <Button
+                                                                                    onClick={handleUpdate}
+                                                                                    disabled={isUpdating || !senderName.trim()}
+                                                                                >
+                                                                                    {isUpdating ? (
+                                                                                        <>
+                                                                                            <Loader className="animate-spin size-4 mr-2" />
+                                                                                            กำลังอัพเดท...
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        'บันทึก'
+                                                                                    )}
+                                                                                </Button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </DialogContent>
+                                                                </Dialog>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={2} className="text-muted-foreground italic">
+                                                            No senders for this server.
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                )}
+            </CardContent>
+        </Card>
     );
 }
