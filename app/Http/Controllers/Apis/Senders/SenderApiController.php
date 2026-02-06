@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Apis\Senders;
 
+use App\Helpers\UploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Sendings\Sender;
 use Exception;
@@ -36,21 +37,50 @@ class SenderApiController extends Controller
                 'name' => 'required',
                 'request_id' => 'required',
                 'server_id' => 'required',
+                'images' => 'required',
+                'images.*' => 'image',
             ]);
 
-            $user = $request->user();
+            $user_id = $request->user()->id;
             $request_id = $request->request_id;
             $server_id = $request->server_id;
             $name = $request->name;
-            $user_id = $user->id;
             $is_free = $request->is_free ?? false;
 
-            $sender = new Sender;
-            $sender->name = $name;
-            $sender->user_id = $is_free ? null : $user_id;
-            $sender->server_id = $server_id;
-            $sender->status = Sender::STATUS_PENDING;
-            if ($sender->save()) {
+
+            $data = [
+                'sources' => 'user',
+                'type' => 'sender',
+                'path' => "upload/users/{$user_id}/senders",
+                'user_id' => $user_id,
+            ];
+
+            $files = $request->file('images');
+            $file_ids = [];
+            if ($files) {
+                // รองรับทั้ง single file และ multiple files
+                if (!is_array($files)) {
+                    $files = [$files];
+                }
+
+                foreach ($files as $file) {
+                    $getData = UploadHelper::uploadFileGetId($file, $data);
+                    if($getData['success']){
+                        $file_ids[] = $getData['data']['id'];
+                    }
+                }
+            }
+
+            $sender = Sender::create([
+                'name' => $name,
+                'user_id' => $user_id,
+                'server_id' => $server_id,
+                'status' => Sender::STATUS_PENDING,
+                'resource_ids' => $file_ids,
+                'content' => $request->content,
+            ]);
+
+            if ($sender) {
                 return response()->json([
                     'message' => 'สำเร็จ',
                     'data' => $sender,

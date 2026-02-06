@@ -61,6 +61,7 @@ export default function SmsAddPage(request: any) {
         campaign_name: z.string().min(1, 'หรุณากรอกแคมเปญ'),
         sender: z.string().min(1, { message: "ห้ามว่าง" }),
         receivers: z.string().min(1, { message: "ห้ามว่าง" }),
+        receivers_file: z.any().optional(),
         msg: z.string({ message: "กรุณากรอกข้อความ" }).min(0, { message: "ต้องมีข้อความอย่างน้อย 1 ตัวอักษร" }),
         receiver_count: z.number(),
         is_scheduled: z.boolean(),
@@ -218,12 +219,46 @@ export default function SmsAddPage(request: any) {
                         />
                         <FormField
                             control={form.control}
+                            name="receivers_file"
+                            render={({ field: { value, onChange, ...fieldProps } }) => (
+                                <FormItem>
+                                    <FormLabel>นำเข้าจากไฟล์</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="file"
+                                            accept=".txt,.csv"
+                                            multiple
+                                            disabled={isFetch}
+                                            onChange={async (e) => {
+                                                const files = e.target.files;
+                                                if (files && files.length > 0) {
+                                                    let combinedContent = form.getValues('receivers') || '';
+                                                    for (const file of Array.from(files)) {
+                                                        combinedContent += '\n' + (await file.text());
+                                                    }
+                                                    const normalized = normalizePhones(combinedContent);
+                                                    form.setValue('receivers', normalized.join('\n'), { shouldValidate: true });
+                                                }
+                                                onChange(e.target.files);
+                                            }}
+                                            {...fieldProps}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        รองรับไฟล์ .txt และ .csv สามารถเลือกได้หลายไฟล์พร้อมกัน ระบบจะกรองเบอร์โทรศัพท์ให้อัตโนมัติ
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="receivers"
                             render={({ field, fieldState }) => (
                                 <FormItem>
                                     <FormLabel>หมายเลขโทนศัพมือถือ</FormLabel>
                                     <FormControl>
-                                        <Textarea className="h-24" placeholder="098...." disabled={isFetch} {...field}></Textarea>
+                                        <Textarea className="h-48" placeholder="098...." disabled={isFetch} {...field}></Textarea>
                                     </FormControl>
                                     <FormDescription className="w-full flex gap-4 justify-between">
                                         <span>สามารเพิ่มเบอร์ได้มากกว่าา 1 เบอร์โดยใช้ <span className="bg-primary/50 text-primary-foreground rounded-full py-0 px-0.5">,</span> <span className="bg-primary/50 text-primary-foreground rounded-full py-0 px-0.5">;</span> หรือ <span className="bg-primary/50 text-primary-foreground rounded-full py-0 px-0.5">Enter</span> เพื่มเพิ่มเบอร์</span>

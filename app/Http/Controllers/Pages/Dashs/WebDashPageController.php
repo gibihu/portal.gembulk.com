@@ -8,8 +8,10 @@ use App\Models\Sendings\Campaign;
 use App\Models\Sendings\Plan;
 use App\Models\Sendings\Servers\Server;
 use App\Models\Sendings\SpamWord;
+use App\Models\UploadFile;
 use App\Models\Users\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use PhpParser\Node\Stmt\Return_;
@@ -24,6 +26,28 @@ class WebDashPageController extends Controller
         }else{
             return Inertia::render('dashboards/senders/add');
         }
+    }
+
+    public function fileView(Request $request, $id)
+    {
+        $file = UploadFile::where('id', base64_decode($id))->firstOrFail();
+        $user = $request->user();
+        if (!in_array('admin', $user->roles, true) && $user->id !== $file->owner_id) {
+            abort(403);
+        }
+
+        $filePath = $file->path . '/' . $file->name;
+
+        if (Storage::disk('public')->exists($filePath)) {
+            $mimeType = Storage::disk('public')->mimeType($filePath);
+            $fileContent = Storage::disk('public')->get($filePath);
+
+            return response($fileContent, 200)
+                ->header('Content-Type', $mimeType)
+                ->header('Cache-Control', 'public, max-age=604800, immutable');
+        }
+
+        abort(404); // หากไม่พบไฟล์
     }
 
     public function smsAdd()

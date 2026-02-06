@@ -15,8 +15,17 @@ class WebDashAdminPageController extends Controller
 {
     public function senderRequests(Request $request)
     {
-        $sender_request = Sender::with(['server', 'user'])->where('status', Sender::STATUS_PENDING)->get();
+        $sender_request = Sender::with([
+            'server:id,name',
+            'user:id,name',
+        ])
+        ->select([
+            'id', 'name', 'server_id', 'user_id', 'resource_ids', 'status', 'content'
+        ])
+        ->where('status', Sender::STATUS_PENDING)
+        ->get();
 
+        $sender_request->each->append('resource');
         return Inertia::render('dashboards/admins/senders/request', compact('sender_request'));
     }
 

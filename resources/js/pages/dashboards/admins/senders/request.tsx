@@ -1,5 +1,7 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AppLayout from "@/layouts/app-layout";
@@ -73,15 +75,14 @@ export default function Dashboard(request: any) {
                 <div className="text-primary-foreground font-bold text-2xl">
                     ตารางอนุมัติผู้ส่ง
                 </div>
-                <Card className="p-0">
+                <Card className="p-0 overflow-hidden">
                     <CardContent className="bg-background rounded-2xl p-0">
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="font-bold text-lg pl-6">ชื่อผู้ส่ง</TableHead>
-                                    <TableHead className="font-bold text-lg">ชื่อผู้ขอ</TableHead>
-                                    <TableHead className="font-bold text-lg">เซิฟเวอร์</TableHead>
-                                    <TableHead className="font-bold text-lg">-</TableHead>
+                                    <TableHead className="pl-6">ชื่อผู้ส่ง</TableHead>
+                                    <TableHead>ชื่อผู้ขอ</TableHead>
+                                    <TableHead>เซิฟเวอร์</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -91,6 +92,45 @@ export default function Dashboard(request: any) {
                                         <TableCell>{sender.user?.name}</TableCell>
                                         <TableCell>{sender.server?.name}</TableCell>
                                         <TableCell className="flex gap-2 justify-end me-4">
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline">
+                                                        ดูรายละเอียด
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="p-0">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="p-4 pb-0">Are you absolutely sure?</DialogTitle>
+                                                        <DialogDescription className="p-4 pe-0" asChild>
+                                                            <div className="flex flex-col gap-4 max-h-[90svh] overflow-y-auto">
+                                                                <pre className="text-foreground">
+                                                                    {sender.content}
+                                                                </pre>
+                                                            </div>
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                </DialogContent>
+                                            </Dialog>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline">
+                                                        ดูไฟล์
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="p-0">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="p-4 pb-0">Are you absolutely sure?</DialogTitle>
+                                                        <DialogDescription className="p-4 max-h-[90svh] " asChild>
+                                                            <div className="flex flex-col gap-4overflow-y-auto">
+                                                                {sender.resource?.map((resc: string, i: number) => (
+                                                                    <img src={resc} alt={resc} key={i} />
+                                                                ))}
+                                                            </div>
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                </DialogContent>
+                                            </Dialog>
+
                                             {sender.status_text === 'pending' ? (
                                                 <Button variant="success" disabled={isFetch} onClick={() => Actions(sender.id, 'completed')}>
                                                     {isFetch ? (

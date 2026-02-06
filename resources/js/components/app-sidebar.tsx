@@ -50,15 +50,15 @@ export function AppSidebar() {
             title: "Platform",
             items: [
                 {
-                    title: "Sender",
-                    href: web.dashboard.senders.add().url,
-                    icon: Ticket,
-                    isActive: false,
-                },
-                {
                     title: "SMS",
                     href: web.dashboard.sending.sms.add().url,
                     icon: Notebook,
+                    isActive: false,
+                },
+                {
+                    title: "Sender",
+                    href: web.dashboard.senders.add().url,
+                    icon: Ticket,
                     isActive: false,
                 },
                 {
