@@ -77,7 +77,7 @@ class SenderApiController extends Controller
                 'server_id' => $server_id,
                 'status' => Sender::STATUS_PENDING,
                 'resource_ids' => $file_ids,
-                'content' => $request->content,
+                'content' => $request['content'],
             ]);
 
             if ($sender) {
