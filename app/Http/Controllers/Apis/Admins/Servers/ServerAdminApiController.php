@@ -15,7 +15,7 @@ class ServerAdminApiController extends Controller
     public function index(Request $request)
     {
         try {
-            $servers = Server::when($request->select, function ($query, $select) {
+            $servers = Server::with('senders')->when($request->select, function ($query, $select) {
                 $columns = is_array($select)
                     ? $select
                     : explode(',', $select);
