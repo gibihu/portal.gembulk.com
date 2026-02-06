@@ -72,7 +72,7 @@ export default function Dashboard(request: any) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
             <div className="flex flex-col gap-4">
-                <div className="text-primary-foreground font-bold text-2xl">
+                <div className="text-foreground font-bold text-2xl">
                     ตารางอนุมัติผู้ส่ง
                 </div>
                 <Card className="p-0 overflow-hidden">

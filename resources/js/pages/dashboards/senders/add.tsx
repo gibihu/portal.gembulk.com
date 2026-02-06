@@ -338,7 +338,7 @@ export default function AddSenderPage(request: any) {
                 >
                     <form onSubmit={form.handleSubmit(submit)}>
                         <div className="flex flex-col gap-4">
-                            <div className="w-full flex justify-between items-center">
+                            <div className="w-full flex justify-between items-center hidden">
                                 <Select defaultValue={servers?.[0]?.id?.toString()} value={selectedServer?.id.toString()}>
                                     <SelectTrigger className="w-[180px] bg-background">
                                         <SelectValue placeholder="เลือกเซิฟเวอร์" />
