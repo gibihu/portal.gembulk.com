@@ -1,4 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,7 +12,7 @@ import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { SenderType, ServerType } from "@/types/user";
 import { Head } from "@inertiajs/react";
-import { Check, Fullscreen, Loader, Pencil, X } from "lucide-react";
+import { Check, Fullscreen, Loader, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -183,6 +184,9 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
     const [senderName, setSenderName] = useState<string>("");
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [deletingSender, setDeletingSender] = useState<SenderType | null>(null);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -264,6 +268,48 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
             setIsUpdating(false);
         }
     };
+
+    const handleDelete = async () => {
+        if (!deletingSender) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const way = api.admins.senders.requests.actions();
+            const res = await fetch(way.url, {
+                method: way.method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
+                body: JSON.stringify({
+                    sender_id: deletingSender.id,
+                    action: 'rejected',
+                })
+            });
+            const response = await res.json();
+            if (res.ok && response.code === 200) {
+                // ลบ sender ออกจาก state
+                setServers(prev =>
+                    prev.map(server => ({
+                        ...server,
+                        senders: server.senders?.filter(sender => sender.id !== deletingSender.id) ?? []
+                    }))
+                );
+                toast.success('ลบผู้ส่งสำเร็จ');
+                setDeletingSender(null);
+                setIsDeleteDialogOpen(false);
+            } else {
+                toast.error(response.message || 'เกิดข้อผิดพลาดในการลบ');
+            }
+        } catch (error) {
+            console.error('Error deleting sender:', error);
+            toast.error('เกิดข้อผิดพลาดในการลบ');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
     return (
         <Card>
             <CardHeader>
@@ -291,7 +337,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                                             <TableRow key={sender.id || i}>
                                                                 <TableCell>{sender.name}</TableCell>
                                                                 <TableCell>{sender.status_text}</TableCell>
-                                                                <TableCell className="flex justify-end">
+                                                                <TableCell className="flex justify-end gap-2">
                                                                     <Dialog open={isDialogOpen && editingSender?.id === sender.id} onOpenChange={handleDialogOpenChange}>
                                                                         <DialogTrigger asChild>
                                                                             <Button variant="outline" onClick={() => handleEditClick(sender)}>
@@ -340,6 +386,64 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                                                             </div>
                                                                         </DialogContent>
                                                                     </Dialog>
+                                                                    {sender.user_id != null && (
+                                                                        <AlertDialog open={isDeleteDialogOpen && deletingSender?.id === sender.id} onOpenChange={(open) => {
+                                                                            setIsDeleteDialogOpen(open);
+                                                                            if (!open) {
+                                                                                setDeletingSender(null);
+                                                                            }
+                                                                        }}>
+                                                                            <AlertDialogTrigger asChild>
+                                                                                <Button 
+                                                                                    variant="destructive" 
+                                                                                    onClick={() => {
+                                                                                        setDeletingSender(sender);
+                                                                                        setIsDeleteDialogOpen(true);
+                                                                                    }}
+                                                                                    disabled={isDeleting}
+                                                                                >
+                                                                                    {isDeleting && deletingSender?.id === sender.id ? (
+                                                                                        <Loader className="size-4 animate-spin" />
+                                                                                    ) : (
+                                                                                        <Trash2 className="size-4" />
+                                                                                    )}
+                                                                                </Button>
+                                                                            </AlertDialogTrigger>
+                                                                            <AlertDialogContent>
+                                                                                <AlertDialogHeader>
+                                                                                    <AlertDialogTitle>ยืนยันการลบ</AlertDialogTitle>
+                                                                                    <AlertDialogDescription>
+                                                                                        คุณแน่ใจหรือไม่ว่าต้องการลบผู้ส่ง "{sender.name}"? การกระทำนี้ไม่สามารถยกเลิกได้
+                                                                                    </AlertDialogDescription>
+                                                                                </AlertDialogHeader>
+                                                                                <AlertDialogFooter>
+                                                                                    <AlertDialogCancel 
+                                                                                        disabled={isDeleting}
+                                                                                        onClick={() => {
+                                                                                            setIsDeleteDialogOpen(false);
+                                                                                            setDeletingSender(null);
+                                                                                        }}
+                                                                                    >
+                                                                                        ยกเลิก
+                                                                                    </AlertDialogCancel>
+                                                                                    <AlertDialogAction
+                                                                                        onClick={handleDelete}
+                                                                                        disabled={isDeleting}
+                                                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                                                    >
+                                                                                        {isDeleting ? (
+                                                                                            <>
+                                                                                                <Loader className="animate-spin size-4 mr-2" />
+                                                                                                กำลังลบ...
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            'ลบ'
+                                                                                        )}
+                                                                                    </AlertDialogAction>
+                                                                                </AlertDialogFooter>
+                                                                            </AlertDialogContent>
+                                                                        </AlertDialog>
+                                                                    )}
                                                                 </TableCell>
                                                             </TableRow>
                                                         ))
