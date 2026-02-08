@@ -72,89 +72,266 @@ export default function Dashboard() {
                 </div>
 
                 <div className="grid gap-6">
-                    {/* Authentication Section */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>การยืนยันตัวตน</CardTitle>
-                            <CardDescription>
-                                เพื่อความปลอดภัย โปรดระบุตรวจสอบ API Key ของคุณในส่วนหัว <code>x-api-key</code>
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-3">
-                                <span className="font-mono text-sm font-semibold">x-api-key:</span>
-                                <span className="max-w-full overflow-hidden text-ellipsis font-mono text-sm text-muted-foreground">
-                                    YOUR_API_KEY
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Send OTP Endpoint */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-4">
-                                <Badge className="bg-primary hover:bg-primary/80">POST</Badge>
-                                <span className="break-all font-mono text-sm text-muted-foreground">/otp/send</span>
-                            </div>
-                            <CardTitle className="mt-2">ส่ง OTP</CardTitle>
-                            <CardDescription>ส่งข้อความ OTP ไปยังผู้รับที่ระบุโดยใช้การตั้งค่าแคมเปญของคุณ</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
-                                <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
-                                    {api_base_url}/otp/send
-                                    <CopyUrlButton url={`${api_base_url}/otp/send`} />
+                    <div className="flex flex-col gap-4">
+                        {/* Authentication Section */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>การยืนยันตัวตน</CardTitle>
+                                <CardDescription>
+                                    เพื่อความปลอดภัย โปรดระบุตรวจสอบ API Key ของคุณในส่วนหัว <code>x-api-key</code>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-3">
+                                    <span className="font-mono text-sm font-semibold">x-api-key:</span>
+                                    <span className="max-w-full overflow-hidden text-ellipsis font-mono text-sm text-muted-foreground">
+                                        YOUR_API_KEY
+                                    </span>
                                 </div>
-                            </div>
-
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">ข้อมูลที่ต้องส่ง (Request Body)</h3>
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
-                                                <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
-                                                <TableHead className="w-[100px]">จำเป็น</TableHead>
-                                                <TableHead>คำอธิบาย</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <TableRow>
-                                                <TableCell className="font-medium">receiver</TableCell>
-                                                <TableCell>string</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">ใช่</Badge>
-                                                </TableCell>
-                                                <TableCell>เบอร์โทรศัพท์สำหรับรับ OTP</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell className="font-medium">sender_name</TableCell>
-                                                <TableCell>string</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">ใช่</Badge>
-                                                </TableCell>
-                                                <TableCell>ชื่อผู้ส่งที่จะแสดงบนอุปกรณ์ของผู้รับ</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell className="font-medium">ref_id</TableCell>
-                                                <TableCell>string</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline" className="text-muted-foreground">ไม่บังคับ</Badge>
-                                                </TableCell>
-                                                <TableCell>รหัสอ้างอิงที่กำหนดเองสำหรับการติดตามของคุณ</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                            </CardContent>
+                        </Card>
+                        {/* Send SMS Endpoint */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-4">
+                                    <Badge className="bg-primary hover:bg-primary/80">POST</Badge>
+                                    <span className="break-all font-mono text-sm text-muted-foreground">/sms/send</span>
                                 </div>
-                            </div>
+                                <CardTitle className="mt-2">ส่ง SMS</CardTitle>
+                                <CardDescription>ส่งข้อความ SMS ไปยังผู้รับที่ระบุโดยใช้การตั้งค่าแคมเปญของคุณ</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
+                                    <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
+                                        {api_base_url}/sms/send
+                                        <CopyUrlButton url={`${api_base_url}/sms/send`} />
+                                    </div>
+                                </div>
 
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (201 Created)</h3>
-                                <CodeBlock
-                                    code={`{
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ข้อมูลที่ต้องส่ง (Request Body)</h3>
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
+                                                    <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
+                                                    <TableHead className="w-[100px]">จำเป็น</TableHead>
+                                                    <TableHead>คำอธิบาย</TableHead>
+                                                    <TableHead>ตัวอย่าง</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">campaign_name</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="text-muted-foreground">ไม่บังคับ</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>ตั่งชื่อแคมเปญ</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">receivers</TableCell>
+                                                    <TableCell>array</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell>เบอร์โทรศัพท์สำหรับรับ SMS</TableCell>
+                                                    <TableCell>["086xxx","098xxx"]</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">sender_name</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>ชื่อผู้ส่งที่จะแสดงบนอุปกรณ์ของผู้รับ</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">message</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>ข้อความที่ต้องการส่ง</TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (201 Created)</h3>
+                                    <CodeBlock
+                                        code={`{
+    "success": true,
+    "message": "SMS sent successfully",
+    "data": {
+        "campaign_id": 019c23dc-fca3-720e-be69-38xxxxxxxxx,
+        "message": "HAPPY NEW YEAR!",
+        "cost": "100",
+        "credits": 999
+    },
+    "code": 201
+}`}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Report Endpoint */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-4">
+                                    <Badge variant="secondary" className="bg-success text-white hover:bg-success">
+                                        GET
+                                    </Badge>
+                                    <span className="break-all font-mono text-sm text-muted-foreground">/otp/{`{campaign_id}`}</span>
+                                </div>
+                                <CardTitle className="mt-2">ตรวจสอบสถานะ</CardTitle>
+                                <CardDescription>ดึงสถานะการจัดส่ง SMS โดยระบุ ID แคมเปญ</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
+                                    <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
+                                        {api_base_url}/otp/{`{campaign_id}`}
+                                        <CopyUrlButton url={`${api_base_url}/otp/{campaign_id}`} />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">พารามิเตอร์</h3>
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
+                                                    <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
+                                                    <TableHead className="w-[100px]">จำเป็น</TableHead>
+                                                    <TableHead>คำอธิบาย</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">campaign_id</TableCell>
+                                                    <TableCell>integer</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell>ID เฉพาะของแคมเปญที่ต้องการตรวจสอบ</TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (200 OK)</h3>
+                                    <CodeBlock
+                                        code={`{
+    "success": true,
+    "message": "Get Report Successfully",
+    "data": {
+        "success": true,
+        "campaign_id": 019c23dc-fca3-720e-be69-38xxxxxxxx,
+        "campaign_name": "Congratulations"
+        "total_receiver": 100,
+        "sent": 80,
+        "failed": 7,
+        "pending": 3,
+        "passed": 70,
+        "credits_refund": 10,
+        "status": "completed",
+        "sent_at": "2024-02-04T10:00:00.000000Z",
+        "updated_at": "2024-02-04T10:00:05.000000Z",
+        "created_at": "2024-02-04T10:00:00.000000Z"
+    },
+    "code": 200
+}`}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className="flex flex-col gap-4">
+
+                        {/* Send OTP Endpoint */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-4">
+                                    <Badge className="bg-primary hover:bg-primary/80">POST</Badge>
+                                    <span className="break-all font-mono text-sm text-muted-foreground">/otp/send</span>
+                                </div>
+                                <CardTitle className="mt-2">ส่ง OTP</CardTitle>
+                                <CardDescription>ส่งข้อความ OTP ไปยังผู้รับที่ระบุโดยใช้การตั้งค่าแคมเปญของคุณ</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
+                                    <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
+                                        {api_base_url}/otp/send
+                                        <CopyUrlButton url={`${api_base_url}/otp/send`} />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ข้อมูลที่ต้องส่ง (Request Body)</h3>
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
+                                                    <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
+                                                    <TableHead className="w-[100px]">จำเป็น</TableHead>
+                                                    <TableHead>คำอธิบาย</TableHead>
+                                                    <TableHead>ตัวอย่าง</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">campaign_name</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="text-muted-foreground">ไม่บังคับ</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>ตั่งชื่อแคมเปญ</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">receiver</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>เบอร์โทรศัพท์สำหรับรับ OTP</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">sender_name</TableCell>
+                                                    <TableCell>string | array:1</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell>ชื่อผู้ส่งที่จะแสดงบนอุปกรณ์ของผู้รับ</TableCell>
+                                                    <TableCell>"098xxx" หรือ [6698xxx]</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">ref_id</TableCell>
+                                                    <TableCell>string</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="text-muted-foreground">ไม่บังคับ</Badge>
+                                                    </TableCell>
+                                                    <TableCell colSpan={2}>รหัสอ้างอิงที่กำหนดเองสำหรับการติดตามของคุณ</TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (201 Created)</h3>
+                                    <CodeBlock
+                                        code={`{
     "success": true,
     "message": "OTP sent successfully",
     "data": {
@@ -162,65 +339,66 @@ export default function Dashboard() {
         "message": "Your OTP code is: 123456",
         "ref_id": "cust_ref_001",
         "otp_code": "123456"
+        "credits" : 9999
     },
     "code": 201
 }`}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Report Endpoint */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-4">
-                                <Badge variant="secondary" className="bg-success text-white hover:bg-success">
-                                    GET
-                                </Badge>
-                                <span className="break-all font-mono text-sm text-muted-foreground">/otp/{`{campaign_id}`}</span>
-                            </div>
-                            <CardTitle className="mt-2">ตรวจสอบสถานะ</CardTitle>
-                            <CardDescription>ดึงสถานะการจัดส่ง OTP โดยระบุ ID แคมเปญ</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
-                                <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
-                                    {api_base_url}/otp/{`{campaign_id}`}
-                                    <CopyUrlButton url={`${api_base_url}/otp/{campaign_id}`} />
+                                    />
                                 </div>
-                            </div>
+                            </CardContent>
+                        </Card>
 
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">พารามิเตอร์</h3>
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
-                                                <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
-                                                <TableHead className="w-[100px]">จำเป็น</TableHead>
-                                                <TableHead>คำอธิบาย</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <TableRow>
-                                                <TableCell className="font-medium">campaign_id</TableCell>
-                                                <TableCell>integer</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">ใช่</Badge>
-                                                </TableCell>
-                                                <TableCell>ID เฉพาะของแคมเปญที่ต้องการตรวจสอบ</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                        {/* Report Endpoint */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-4">
+                                    <Badge variant="secondary" className="bg-success text-white hover:bg-success">
+                                        GET
+                                    </Badge>
+                                    <span className="break-all font-mono text-sm text-muted-foreground">/otp/{`{campaign_id}`}</span>
                                 </div>
-                            </div>
+                                <CardTitle className="mt-2">ตรวจสอบสถานะ</CardTitle>
+                                <CardDescription>ดึงสถานะการจัดส่ง OTP โดยระบุ ID แคมเปญ</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">URL ปลายทาง</h3>
+                                    <div className="flex justify-between rounded-md border bg-muted p-2 font-mono text-sm break-all items-center">
+                                        {api_base_url}/otp/{`{campaign_id}`}
+                                        <CopyUrlButton url={`${api_base_url}/otp/{campaign_id}`} />
+                                    </div>
+                                </div>
 
-                            <div className="grid gap-2">
-                                <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (200 OK)</h3>
-                                <CodeBlock
-                                    code={`{
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">พารามิเตอร์</h3>
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[150px]">พารามิเตอร์</TableHead>
+                                                    <TableHead className="w-[100px]">ชนิดข้อมูล</TableHead>
+                                                    <TableHead className="w-[100px]">จำเป็น</TableHead>
+                                                    <TableHead>คำอธิบาย</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell className="font-medium">campaign_id</TableCell>
+                                                    <TableCell>integer</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">ใช่</Badge>
+                                                    </TableCell>
+                                                    <TableCell>ID เฉพาะของแคมเปญที่ต้องการตรวจสอบ</TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <h3 className="text-sm font-medium leading-none">ตัวอย่างการตอบกลับ (200 OK)</h3>
+                                    <CodeBlock
+                                        code={`{
     "success": true,
     "message": "Get Report Successfully",
     "data": {
@@ -234,10 +412,11 @@ export default function Dashboard() {
     },
     "code": 200
 }`}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                     {/* Standard Error Response */}
                     <Card>
                         <CardHeader>
@@ -250,6 +429,16 @@ export default function Dashboard() {
                             <div className="grid gap-2">
                                 <h3 className="text-sm font-medium leading-none">Endpoint ที่รองรับ</h3>
                                 <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-2 text-sm">
+                                        <Badge className="bg-primary hover:bg-primary/80">POST</Badge>
+                                        <span className="font-mono text-muted-foreground">/sms/send</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-2 text-sm">
+                                        <Badge variant="secondary" className="bg-success text-white hover:bg-success">
+                                            GET
+                                        </Badge>
+                                        <span className="font-mono text-muted-foreground">/sms/{`{campaign_id}`}</span>
+                                    </div>
                                     <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-2 text-sm">
                                         <Badge className="bg-primary hover:bg-primary/80">POST</Badge>
                                         <span className="font-mono text-muted-foreground">/otp/send</span>

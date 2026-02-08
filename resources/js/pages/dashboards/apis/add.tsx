@@ -164,9 +164,7 @@ export default function OtpTemplatePage(request: any) {
                 id: null,
                 api_key: "",
                 template: "",
-                options: {
-                    option_1: false,
-                },
+                options: {},
                 permissions: {
                     read: false,
                     write: false,
@@ -315,7 +313,20 @@ export default function OtpTemplatePage(request: any) {
                                                             );
                                                         }}
                                                     />
-                                                    <label htmlFor="otp">OTP</label>
+                                                    <label htmlFor="otp" className="flex-1">OTP</label>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        id="sms"
+                                                        checked={apiKeyForm.watch("options.sms") ?? false}
+                                                        onCheckedChange={(checked) => {
+                                                            apiKeyForm.setValue(
+                                                                "options.sms",
+                                                                checked as boolean
+                                                            );
+                                                        }}
+                                                    />
+                                                    <label htmlFor="sms" className="flex-1">SMS</label>
                                                 </div>
                                             </div>
                                         </FormItem>
