@@ -377,7 +377,7 @@ class ActionServerHelper
 
             $callback['total_receiver'] = ActionServerHelper::getByPath(
                 $result,
-                $mapping['total_receiver'] ?? 'credits_refund',
+                $mapping['total_receiver'] ?? 'all_numbers',
                 0
             );
 
