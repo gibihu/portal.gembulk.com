@@ -14,6 +14,25 @@ export interface UserType {
     plan: PlanType | null;
     roles: string[];
     avatar: string;
+    verifications?: UserVerificationType[];
+    verified_at?: string;
+    updated_at: string;
+    created_at: string;
+}
+
+export interface UserVerificationType {
+    id: string;
+    user_id: string;
+    admin_id: string;
+    data: {
+        person_type: string,
+        file_ids: string[],
+    };
+    rejected_reason?: string;
+    submitted_at?: string;
+    verified_at?: string;
+    status: number;
+    status_text: string;
     updated_at: string;
     created_at: string;
 }
@@ -67,6 +86,7 @@ export interface ServerCallBackType {
 export interface SenderType {
     id: string;
     user_id: string | null;
+    server_id: string | null;
     name: string;
     resource_ids: string[];
     resource?: string[];
@@ -75,6 +95,12 @@ export interface SenderType {
     status_text: string;
     server?: ServerType | null;
     user?: UserType | null;
+    data: {
+        objective: string;
+        link: string;
+        type: string;
+        sample_message: string;
+    };
     updated_at: string;
     created_at: string;
 }

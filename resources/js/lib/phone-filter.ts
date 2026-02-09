@@ -5,7 +5,7 @@ export function normalizePhones(input: string): string[] {
   const result = new Set<string>();
 
   for (let phone of phones) {
-    phone = phone.trim();
+    phone = phone.trim().replace(/[-\s]/g, ''); // ตัด - และเว้นวรรคออก
 
     let normalized: string | null = null;
 

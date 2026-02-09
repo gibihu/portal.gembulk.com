@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\Admins\Users;
 use App\Http\Controllers\Controller;
 use App\Models\Users\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Throwable;
 
 class UserAdminApiController extends Controller
@@ -15,7 +16,7 @@ class UserAdminApiController extends Controller
             $users = User::with([
                 'plan' => function ($q) {
                     $q->select('id', 'name'); // field ของ plan
-                }
+                }, 'verifications'
             ])->select([
                 'id',
                 'name',
@@ -54,7 +55,15 @@ class UserAdminApiController extends Controller
             $credits = $request->credit_change ?? 0;
 
             $user = User::findOrFail($request->user_id);
-            $user->name = $request->name ?? $user->name;
+
+            if ($request->has('name') && $request->name) {
+                $user->name = $request->name;
+            }
+
+            if ($request->has('password') && $request->password) {
+                $user->password = Hash::make($request->password);
+            }
+
             $user->roles = $roles ?? $user->roles;
             $user->credits = max(0, $user->credits + $credits);
             $user->save();
@@ -62,6 +71,7 @@ class UserAdminApiController extends Controller
             return response()->json([
                 'message' => 'Success',
                 'data' => [
+                    'name' => $user->name,
                     'credits' => $user->credits,
                     'roles' => $user->roles,
                 ],

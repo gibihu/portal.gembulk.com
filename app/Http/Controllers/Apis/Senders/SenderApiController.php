@@ -37,8 +37,6 @@ class SenderApiController extends Controller
                 'name' => 'required',
                 'request_id' => 'required',
                 'server_id' => 'required',
-                'images' => 'required',
-                'images.*' => 'image',
             ]);
 
             $user_id = $request->user()->id;
@@ -46,29 +44,24 @@ class SenderApiController extends Controller
             $server_id = $request->server_id;
             $name = $request->name;
             $is_free = $request->is_free ?? false;
+            $raw = $request['content'];
 
+            if (is_array($raw)) {
+                $content = $raw;
+            } elseif (is_string($raw)) {
 
-            $data = [
-                'sources' => 'user',
-                'type' => 'sender',
-                'path' => "upload/users/{$user_id}/senders",
-                'user_id' => $user_id,
-            ];
+                // ลอง decode json ก่อน
+                $decoded = json_decode($raw, true);
 
-            $files = $request->file('images');
-            $file_ids = [];
-            if ($files) {
-                // รองรับทั้ง single file และ multiple files
-                if (!is_array($files)) {
-                    $files = [$files];
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $content = $decoded;
+                } else {
+                    // fallback เป็น comma
+                    $content = array_map('trim', explode(',', $raw));
                 }
 
-                foreach ($files as $file) {
-                    $getData = UploadHelper::uploadFileGetId($file, $data);
-                    if($getData['success']){
-                        $file_ids[] = $getData['data']['id'];
-                    }
-                }
+            } else {
+                $content = [];
             }
 
             $sender = Sender::create([
@@ -76,8 +69,7 @@ class SenderApiController extends Controller
                 'user_id' => $user_id,
                 'server_id' => $server_id,
                 'status' => Sender::STATUS_PENDING,
-                'resource_ids' => $file_ids,
-                'content' => $request['content'],
+                'data' => $content,
             ]);
 
             if ($sender) {

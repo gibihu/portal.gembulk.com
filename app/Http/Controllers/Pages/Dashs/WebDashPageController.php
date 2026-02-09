@@ -78,6 +78,10 @@ class WebDashPageController extends Controller
         return Inertia::render('dashboards/campaigns/reports', compact('campaigns'));
     }
 
+    public function sendersIndex(Request $request)
+    {
+        return Inertia::render('dashboards/senders/list');
+    }
     public function senderAdd(Request $request)
     {
         $sender_id = Str::uuid()->toString();
@@ -119,5 +123,17 @@ class WebDashPageController extends Controller
     {
         $plan = Plan::findOrFail($id);
         return Inertia::render('dashboards/plans/payment', compact('plan'));
+    }
+
+    public function usersVerify(Request $request)
+    {
+        $user = $request->user()->load('latestVerification');
+//        dd($user);
+
+        return Inertia::render('dashboards/users/verify', [
+            'auth' => [
+                'user' => $user,
+            ],
+        ]);
     }
 }

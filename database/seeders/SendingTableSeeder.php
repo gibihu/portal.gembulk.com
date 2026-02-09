@@ -282,6 +282,7 @@ class SendingTableSeeder extends Seeder
                 'password' => '123456789',
                 'roles' => [$role1->name, $role2->name],
                 'email_verified_at' => now(),
+                'verified_at' => now(),
                 'credits' => 10000,
                 'plan_id' => $plan->id,
             ]

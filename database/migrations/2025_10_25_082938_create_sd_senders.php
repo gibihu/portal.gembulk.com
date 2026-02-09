@@ -20,7 +20,7 @@ return new class extends Migration
             $table->uuid('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->json('resource_ids')->default('{}');
+            $table->json('data')->default('{}');
             $table->text('content')->nullable();
 
             $table->tinyInteger('status')->default(0);

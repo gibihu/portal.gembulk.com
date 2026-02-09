@@ -49,6 +49,7 @@ class AuthController extends Controller
 
         $data = array_merge($validated, [
             'roles' => Role::where('name', 'user')->pluck('name')->toArray(),
+            'status' => User::STATUS_PENDING,
         ]);
         $user = User::create($data);
         Auth::login($user);

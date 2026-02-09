@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-
             $table->bigInteger('credits')->default(0);
             $table->uuid('plan_id')->index()->nullable();
-
             $table->json('roles')->nullable();
+            $table->tinyInteger('status')->default(0);
+            $table->timestamp('verified_at')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

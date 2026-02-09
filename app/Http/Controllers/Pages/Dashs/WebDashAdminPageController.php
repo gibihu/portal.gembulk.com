@@ -20,12 +20,10 @@ class WebDashAdminPageController extends Controller
             'user:id,name',
         ])
         ->select([
-            'id', 'name', 'server_id', 'user_id', 'resource_ids', 'status', 'content'
+            'id', 'name', 'server_id', 'user_id', 'status', 'content', 'data'
         ])
         ->where('status', Sender::STATUS_PENDING)
         ->get();
-
-        $sender_request->each->append('resource');
         return Inertia::render('dashboards/admins/senders/request', compact('sender_request'));
     }
 
@@ -82,6 +80,11 @@ class WebDashAdminPageController extends Controller
     public function usersIndex(Request $request)
     {
         return Inertia::render('dashboards/admins/users/list');
+    }
+
+    public function usersVerify(Request $request)
+    {
+        return Inertia::render('dashboards/admins/users/verification');
     }
 
 }

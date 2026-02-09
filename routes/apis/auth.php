@@ -4,6 +4,7 @@ use App\Http\Controllers\Apis\Admins\Plans\PlanAdminApiController;
 use App\Http\Controllers\Apis\Admins\Sender\SenderAdminApiController;
 use App\Http\Controllers\Apis\Admins\Servers\ServerAdminApiController;
 use App\Http\Controllers\Apis\Admins\Users\UserAdminApiController;
+use App\Http\Controllers\Apis\Admins\Users\UserVerificationAdminApiController;
 use App\Http\Controllers\Apis\ApiKeyController;
 use App\Http\Controllers\Apis\Dashs\Sending\SMSApiController;
 use App\Http\Controllers\Apis\Payments\PaymentApiController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Apis\Plans\PlansApiController;
 use App\Http\Controllers\Apis\Senders\SenderApiController;
 use App\Http\Controllers\Apis\Servers\ServerApiController;
 use App\Http\Controllers\Apis\Transactions\TransactionApiController;
+use App\Http\Controllers\Apis\Users\UserVerificationApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'throttle:60,1'])->prefix('api')->name('api.')->group(function () {
@@ -53,14 +55,20 @@ Route::middleware(['auth', 'throttle:60,1'])->prefix('api')->name('api.')->group
         Route::get('list', 'list')->name('list');
     });
 
+    Route::controller(UserVerificationApiController::class)->prefix('users')->name('users.')->group(function () {
+        Route::post('verify', 'store')->name('verify.store');
+    });
+
     Route::middleware(['role:admin'])->prefix('admins')->name('admins.')->group(function () {
         Route::controller(SenderAdminApiController::class)->prefix('senders')->name('senders.')->group(function () {
             Route::prefix('requests')->name('requests.')->group(function () {
                 Route::post('/actions', 'senderRequestActions')->name('actions');
                 Route::delete('/destroy', 'destroy')->name('destroy');
             });
+
             Route::get('list', 'list')->name('list');
             Route::post('update', 'update')->name('update');
+            Route::post('store', 'store')->name('store');
         });
 
         Route::controller(ServerAdminApiController::class)->prefix('servers')->name('servers.')->group(function () {
@@ -77,6 +85,10 @@ Route::middleware(['auth', 'throttle:60,1'])->prefix('api')->name('api.')->group
         Route::controller(UserAdminApiController::class)->prefix('users')->name('users.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/store', 'store')->name('store');
+        });
+
+        Route::controller(UserVerificationAdminApiController::class)->prefix('users/verifications')->name('users.verifications.')->group(function () {
+            Route::post('/update', 'update')->name('update');
         });
     });
 });
