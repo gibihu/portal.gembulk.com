@@ -98,4 +98,50 @@ class SenderAdminApiController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'server_ids' => ['required', 'array', 'min:1'],
+                'server_ids.*' => ['required', 'string', 'exists:sd_servers,id'],
+                'user_id' => ['nullable', 'string', 'exists:users,id'],
+            ]);
+
+            $senders = DB::transaction(function () use ($validated) {
+                $created = [];
+
+                foreach ($validated['server_ids'] as $serverId) {
+                    $created[] = Sender::create([
+                        'name' => $validated['name'],
+                        'server_id' => $serverId,
+                        'user_id' => $validated['user_id'] ?? null,
+                        'status' => Sender::STATUS_ACTIVE,
+                    ]);
+                }
+
+                return $created;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'สร้างผู้ส่งสำเร็จ',
+                'data' => $senders,
+                'code' => 200,
+            ], 200);
+        } catch (Exception $e) {
+            $response = [
+                'success' => false,
+                'message' => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
+                'description' => $e->getMessage() ?? '',
+                'code' => 500,
+            ];
+            if (config('app.debug')) $response['debug'] = [
+                'message' => $e->getMessage() ?? '',
+                'request' => $request->all(),
+            ];
+            return response()->json($response, 500);
+        }
+    }
 }

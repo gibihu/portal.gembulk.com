@@ -4,13 +4,14 @@ namespace App\Models\Users;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Sendings\Plan;
+use App\Traits\GlobalStatusTrait;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasUuids, HasFactory;
+    use GlobalStatusTrait, HasUuids, HasFactory;
     protected $table = 'users';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'plan_id',
         'roles',
         'avatar',
+        'status',
     ];
 
     protected $hidden = [
@@ -34,7 +36,6 @@ class User extends Authenticatable
         'remember_token',
         'plan_id'
     ];
-
     protected function casts(): array
     {
         return [
@@ -57,6 +58,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(ApiKey::class);
     }
+
 //    แปลงเป็นข้อความ
     public function getRolesAttribute($value)
     {
@@ -85,5 +87,14 @@ class User extends Authenticatable
 
             $this->attributes['roles'] = json_encode([]);
         }
+    }
+    public function verifications()
+    {
+        return $this->hasMany(UserVerification::class);
+    }
+
+    public function latestVerification()
+    {
+        return $this->hasOne(UserVerification::class)->latest();
     }
 }

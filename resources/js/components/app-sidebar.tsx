@@ -12,12 +12,13 @@ import {
 } from '@/components/ui/sidebar';
 import { NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { AudioWaveform, BookOpen, Bot, Command, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound, UsersRound } from 'lucide-react';
+import { AudioWaveform, BookOpen, Bot, History, Folder, Frame, GalleryVerticalEnd, LayoutGrid, LifeBuoy, PieChart, Send, Settings2, SquareTerminal, Map, Notebook, Layers, Server, ChartSpline, Wallet, Ticket, TicketCheck, LandPlot, KeyRound, UsersRound } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavProjects } from './nav-project';
 import web from '@/routes/web';
 import { UserType } from '@/types/user';
 import { check } from 'node_modules/zod/v4/classic/external.cjs';
+import { title } from 'process';
 
 const mainNavItems: NavItem[] = [
     {
@@ -50,34 +51,39 @@ export function AppSidebar() {
             title: "Platform",
             items: [
                 {
-                    title: "SMS",
+                    title: "ส่งข้อความ",
                     href: web.dashboard.sending.sms.add().url,
                     icon: Notebook,
-                    isActive: false,
                 },
                 {
-                    title: "Sender",
-                    href: web.dashboard.senders.add().url,
+                    title: "จัดการ Sender",
+                    href: web.dashboard.senders.index().url,
                     icon: Ticket,
-                    isActive: false,
                 },
                 {
-                    title: "Jobs",
+                    title: "กำลังทำงาน",
                     href: web.dashboard.jobs.sms().url,
                     icon: Bot,
-                    isActive: false,
                 },
                 {
-                    title: "Reports",
+                    title: "ประวัติส่ง",
                     href: web.dashboard.campaigns.reports().url,
                     icon: Layers,
-                    isActive: false,
+                },
+                {
+                    title: "สั้งซื้อแพคเกจ",
+                    href: web.dashboard.plans.index().url,
+                    icon: LandPlot,
+                },
+                {
+                    title: "ประวัติธุรกรรม",
+                    href: web.dashboard.plans.manage().url,
+                    icon: History,
                 },
                 {
                     title: "Api",
                     href: web.dashboard.api.index().url,
                     icon: KeyRound,
-                    isActive: false,
                     items: [
                         {
                             title: "Documentation",
@@ -95,25 +101,31 @@ export function AppSidebar() {
                         {
                             title: "User",
                             href: web.dashboard.admins.users.index().url,
-                            isActive: false,
                             icon: UsersRound,
+                            items: [
+                                {
+                                    title: "ยืนยันตัวตน",
+                                    href: web.dashboard.admins.users.verify().url,
+                                },
+                                {
+                                    title: "รายชื่อ",
+                                    href: web.dashboard.admins.users.index().url,
+                                }
+                            ]
                         },
                         {
                             title: "Server",
                             href: web.dashboard.admins.server.lists().url,
                             icon: Server,
-                            isActive: false,
                         },
                         {
                             title: "อนุมัติผู้ส่ง",
                             href: web.dashboard.admins.senders.requests().url,
-                            isActive: false,
                             icon: TicketCheck
                         },
                         {
                             title: "Plans",
                             href: web.dashboard.admins.plans.index().url,
-                            isActive: false,
                             icon: LandPlot,
                         },
                     ],

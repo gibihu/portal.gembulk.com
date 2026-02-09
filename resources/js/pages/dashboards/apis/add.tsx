@@ -65,10 +65,7 @@ export default function OtpTemplatePage(request: any) {
                 setServers(serversData);
                 setSenders(serversData[0].senders || []);
             }
-
-
         };
-
         fetchServers();
     }, []);
 
@@ -77,7 +74,7 @@ export default function OtpTemplatePage(request: any) {
         defaultValues: {
             id: null,
             api_key: "",
-            template: "",
+            template: "รหัสอ้างอิง [{{ref_id}}]:OTP ของคุณคือ {{otp_code}}",
             options: {},
             permissions: {},
         },
@@ -163,8 +160,10 @@ export default function OtpTemplatePage(request: any) {
             apiKeyForm.reset({
                 id: null,
                 api_key: "",
-                template: "",
-                options: {},
+                template: "รหัสอ้างอิง [{{ref_id}}]:OTP ของคุณคือ {{otp_code}}",
+                options: {
+                    otp: true
+                },
                 permissions: {
                     read: false,
                     write: false,
@@ -268,35 +267,37 @@ export default function OtpTemplatePage(request: any) {
                                         />
 
                                         {/* Description Field */}
-                                        <FormField
-                                            control={apiKeyForm.control}
-                                            name="template"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="flex gap-2">
-                                                        Template
-                                                        <Dialog>
-                                                            <DialogTrigger>
-                                                                <Info className="size-4 text-gray-500" />
-                                                            </DialogTrigger>
-                                                            <DialogContent>
-                                                                <DialogHeader>
-                                                                    <DialogTitle>รูปแบบการแทนค่า</DialogTitle>
-                                                                    <DialogDescription>
-                                                                        <Code>{"{{ref_id}}"} : รหัสอ้างอิง</Code>
-                                                                        <Code>{"{{otp_code}}"} : รหัส OTP</Code>
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Textarea placeholder="{{otp_code}}..." {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        {apiKeyForm.watch("options.otp") ? (
+                                            <FormField
+                                                control={apiKeyForm.control}
+                                                name="template"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="flex gap-2">
+                                                            Template
+                                                            <Dialog>
+                                                                <DialogTrigger>
+                                                                    <Info className="size-4 text-gray-500" />
+                                                                </DialogTrigger>
+                                                                <DialogContent>
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>รูปแบบการแทนค่า</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            <Code>{"{{ref_id}}"} : รหัสอ้างอิง</Code>
+                                                                            <Code>{"{{otp_code}}"} : รหัส OTP</Code>
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Textarea placeholder="{{otp_code}}..." {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        ) : null}
 
                                         {/* Options Checkboxes */}
                                         <FormItem>
@@ -332,7 +333,7 @@ export default function OtpTemplatePage(request: any) {
                                         </FormItem>
 
                                         {/* Permissions Checkboxes */}
-                                        <FormItem>
+                                        {/* <FormItem>
                                             <FormLabel>สิทธิ์</FormLabel>
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2">
@@ -362,7 +363,7 @@ export default function OtpTemplatePage(request: any) {
                                                     <label htmlFor="perm_write">เขียน (Write)</label>
                                                 </div>
                                             </div>
-                                        </FormItem>
+                                        </FormItem> */}
 
                                         {/* Senders Toggle */}
                                         <FormItem>
@@ -375,33 +376,35 @@ export default function OtpTemplatePage(request: any) {
                                                         {senders.map((sender) => {
                                                             const currentSenders = apiKeyForm.watch("permissions.senders") ?? [];
                                                             const isSelected = currentSenders.includes(sender.id);
-                                                            return (
-                                                                <Button
-                                                                    key={sender.id}
-                                                                    type="button"
-                                                                    variant={isSelected ? "default" : "outline"}
-                                                                    size="sm"
-                                                                    className="border"
-                                                                    onClick={() => {
-                                                                        const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
-                                                                        if (isSelected) {
-                                                                            // Remove sender
-                                                                            apiKeyForm.setValue(
-                                                                                "permissions.senders",
-                                                                                sendersList.filter((id: string) => id !== sender.id)
-                                                                            );
-                                                                        } else {
-                                                                            // Add sender
-                                                                            apiKeyForm.setValue(
-                                                                                "permissions.senders",
-                                                                                [...sendersList, sender.id]
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {sender.name}
-                                                                </Button>
-                                                            );
+                                                            if (sender.status_text == "active") {
+                                                                return (
+                                                                    <Button
+                                                                        key={sender.id}
+                                                                        type="button"
+                                                                        variant={isSelected ? "default" : "outline"}
+                                                                        size="sm"
+                                                                        className="border"
+                                                                        onClick={() => {
+                                                                            const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
+                                                                            if (isSelected) {
+                                                                                // Remove sender
+                                                                                apiKeyForm.setValue(
+                                                                                    "permissions.senders",
+                                                                                    sendersList.filter((id: string) => id !== sender.id)
+                                                                                );
+                                                                            } else {
+                                                                                // Add sender
+                                                                                apiKeyForm.setValue(
+                                                                                    "permissions.senders",
+                                                                                    [...sendersList, sender.id]
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {sender.name}
+                                                                    </Button>
+                                                                );
+                                                            }
                                                         })}
                                                     </div>
                                                 )}

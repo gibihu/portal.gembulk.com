@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AppLayout from "@/layouts/app-layout";
@@ -12,9 +13,12 @@ import web from "@/routes/web";
 import { BreadcrumbItem } from "@/types";
 import { SenderType, ServerType } from "@/types/user";
 import { Head } from "@inertiajs/react";
-import { Check, Fullscreen, Loader, Pencil, Trash2, X } from "lucide-react";
+import { Check, Fullscreen, Icon, InboxIcon, Loader, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,6 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard(request: any) {
     console.log(request);
     const csrfToken = request.csrf;
+    const currentUserId = request?.auth?.user?.id ?? null;
     const [isFetch, setIsFetch] = useState<boolean>(false);
     const [senders, setSenders] = useState<SenderType[]>(request.sender_request ?? []);
     console.log(senders);
@@ -74,7 +79,7 @@ export default function Dashboard(request: any) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={breadcrumbs[0].title} />
             <div className="flex flex-col gap-4">
-                <SenderTable csrfToken={csrfToken} />
+                <SenderTable csrfToken={csrfToken} currentUserId={currentUserId} />
                 <Card className="p-0 overflow-hidden">
                     <div className="text-foreground font-bold text-2xl p-4 pb-0">
                         ตารางอนุมัติผู้ส่ง
@@ -113,28 +118,20 @@ export default function Dashboard(request: any) {
                                                         <DialogTitle className="p-4 pb-0">Are you absolutely sure?</DialogTitle>
                                                         <DialogDescription className="p-4 pe-0" asChild>
                                                             <div className="flex flex-col gap-4 max-h-[90svh] overflow-y-auto">
-                                                                <pre className="text-foreground">
-                                                                    {sender.content}
-                                                                </pre>
-                                                            </div>
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-                                                </DialogContent>
-                                            </Dialog>
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline">
-                                                        ดูไฟล์
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent className="p-0">
-                                                    <DialogHeader>
-                                                        <DialogTitle className="p-4 pb-0">Are you absolutely sure?</DialogTitle>
-                                                        <DialogDescription className="p-4 max-h-[90svh] " asChild>
-                                                            <div className="flex flex-col gap-4overflow-y-auto">
-                                                                {sender.resource?.map((resc: string, i: number) => (
-                                                                    <img src={resc} alt={resc} key={i} />
-                                                                ))}
+                                                                {sender.data.objective && (
+                                                                    <div className="flex flex-col gap-2">
+                                                                        <p className="text-foreground font-bold">วัตถุประสงค์</p>
+                                                                        <span>{sender.data.objective}</span>
+                                                                    </div>
+                                                                )}
+
+                                                                {sender.data.type == "with_link" && (
+                                                                    <div className="flex flex-col gap-2">
+                                                                        <p className="text-foreground font-bold">ประสงค์แนบลิงค์</p>
+                                                                        <span>{sender.data.link}</span>
+                                                                        <span>{sender.data.sample_message}</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </DialogDescription>
                                                     </DialogHeader>
@@ -177,7 +174,7 @@ export default function Dashboard(request: any) {
 }
 
 
-function SenderTable({ csrfToken }: { csrfToken: string }) {
+function SenderTable({ csrfToken, currentUserId }: { csrfToken: string, currentUserId: string | null }) {
     const [servers, setServers] = useState<ServerType[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [editingSender, setEditingSender] = useState<SenderType | null>(null);
@@ -187,6 +184,11 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
     const [deletingSender, setDeletingSender] = useState<SenderType | null>(null);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
+    const [isCreating, setIsCreating] = useState<boolean>(false);
+    const [newSenderName, setNewSenderName] = useState<string>("");
+    const [attachToUser, setAttachToUser] = useState<boolean>(false);
+    const [selectedServerIds, setSelectedServerIds] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -206,6 +208,79 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
         }
         fetchData();
     }, []);
+
+    const handleCreateSender = async () => {
+        if (!newSenderName.trim()) {
+            toast.error('กรุณากรอกชื่อผู้ส่ง');
+            return;
+        }
+
+        if (selectedServerIds.length === 0) {
+            toast.error('กรุณาเลือกเซิฟเวอร์อย่างน้อย 1 ตัว');
+            return;
+        }
+
+        if (attachToUser && !currentUserId) {
+            toast.error('ไม่พบข้อมูลผู้ใช้สำหรับผูกกับผู้ส่ง');
+            return;
+        }
+
+        setIsCreating(true);
+        try {
+            const res = await fetch('/api/admins/senders/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
+                body: JSON.stringify({
+                    name: newSenderName.trim(),
+                    server_ids: selectedServerIds,
+                    user_id: attachToUser ? currentUserId : null,
+                }),
+            });
+
+            const response = await res.json();
+
+            if (res.ok && response.code === 200) {
+                const createdSenders: SenderType[] = response.data ?? [];
+
+                const sendersByServerId: Record<string, SenderType[]> = {};
+
+                selectedServerIds.forEach((serverId, index) => {
+                    const sender = createdSenders[index];
+                    if (!sender) return;
+                    if (!sendersByServerId[serverId]) {
+                        sendersByServerId[serverId] = [];
+                    }
+                    sendersByServerId[serverId].push(sender);
+                });
+
+                setServers(prev =>
+                    prev.map(server => ({
+                        ...server,
+                        senders: [
+                            ...(server.senders ?? []),
+                            ...(sendersByServerId[server.id] ?? []),
+                        ],
+                    }))
+                );
+
+                toast.success('สร้างผู้ส่งสำเร็จ');
+                setIsCreateDialogOpen(false);
+                setNewSenderName("");
+                setAttachToUser(false);
+                setSelectedServerIds([]);
+            } else {
+                toast.error(response.message || 'เกิดข้อผิดพลาดในการสร้างผู้ส่ง');
+            }
+        } catch (error) {
+            console.error('Error creating sender:', error);
+            toast.error('เกิดข้อผิดพลาดในการสร้างผู้ส่ง');
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
     const handleEditClick = (sender: SenderType) => {
         setEditingSender(sender);
@@ -312,10 +387,102 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
     };
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
                 <span className="text-foreground font-bold text-2xl">
                     Senders
                 </span>
+                <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+                    setIsCreateDialogOpen(open);
+                    if (!open) {
+                        setNewSenderName("");
+                        setAttachToUser(false);
+                        setSelectedServerIds([]);
+                    }
+                }}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline">
+                            +
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>เพิ่มผู้ส่งใหม่</DialogTitle>
+                            <DialogDescription>
+                                กรอกข้อมูลเพื่อสร้างผู้ส่งใหม่ และเลือกเซิฟเวอร์ที่ต้องการผูก
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex flex-col gap-4 py-4">
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="new-sender-name">ชื่อผู้ส่ง</Label>
+                                <Input
+                                    id="new-sender-name"
+                                    value={newSenderName}
+                                    onChange={(e) => setNewSenderName(e.target.value)}
+                                    placeholder="กรอกชื่อผู้ส่ง"
+                                    disabled={isCreating}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between gap-2">
+                                <Label htmlFor="attach-user">
+                                    ผูกกับผู้ใช้
+                                </Label>
+                                <Switch
+                                    id="attach-user"
+                                    checked={attachToUser}
+                                    onCheckedChange={(checked) => setAttachToUser(!!checked)}
+                                    disabled={isCreating}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="server-select">เลือกเซิฟเวอร์</Label>
+                                <div>
+
+                                    <Select
+                                        value={selectedServerIds[0] || undefined}
+                                        onValueChange={(value) => {
+                                            setSelectedServerIds(value ? [value] : []);
+                                        }}
+                                        disabled={isCreating}
+                                    >
+                                        <SelectTrigger id="server-select" className="min-h-[40px]">
+                                            <SelectValue placeholder="-- เลือกเซิฟเวอร์ --" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {/* Removed <SelectItem value=""> for radix-ui/react-select rule */}
+                                            {servers.map((server) => (
+                                                <SelectItem key={server.id} value={server.id}>
+                                                    {server.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsCreateDialogOpen(false)}
+                                    disabled={isCreating}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button
+                                    onClick={handleCreateSender}
+                                    disabled={isCreating}
+                                >
+                                    {isCreating ? (
+                                        <>
+                                            <Loader className="animate-spin size-4 mr-2" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : (
+                                        'บันทึก'
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </CardHeader>
             <CardContent>
                 {isLoading ? (
@@ -333,7 +500,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                             <Table className="">
                                                 <TableBody>
                                                     {item.senders && item.senders.length > 0 ? (
-                                                        item.senders.map((sender: SenderType, i: number) => (
+                                                        item.senders.map((sender: SenderType, i: number) => (sender.status_text !== 'pending' && (
                                                             <TableRow key={sender.id || i}>
                                                                 <TableCell>{sender.name}</TableCell>
                                                                 <TableCell>{sender.status_text}</TableCell>
@@ -394,8 +561,8 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                                                             }
                                                                         }}>
                                                                             <AlertDialogTrigger asChild>
-                                                                                <Button 
-                                                                                    variant="destructive" 
+                                                                                <Button
+                                                                                    variant="destructive"
                                                                                     onClick={() => {
                                                                                         setDeletingSender(sender);
                                                                                         setIsDeleteDialogOpen(true);
@@ -417,7 +584,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                                                                     </AlertDialogDescription>
                                                                                 </AlertDialogHeader>
                                                                                 <AlertDialogFooter>
-                                                                                    <AlertDialogCancel 
+                                                                                    <AlertDialogCancel
                                                                                         disabled={isDeleting}
                                                                                         onClick={() => {
                                                                                             setIsDeleteDialogOpen(false);
@@ -446,7 +613,7 @@ function SenderTable({ csrfToken }: { csrfToken: string }) {
                                                                     )}
                                                                 </TableCell>
                                                             </TableRow>
-                                                        ))
+                                                        )))
                                                     ) : (
                                                         <TableRow>
                                                             <TableCell className="text-muted-foreground text-center italic">
