@@ -53,6 +53,10 @@ class UserVerificationAdminApiController extends Controller
             $verification->rejected_reason = $status === UserVerification::STATUS_REJECTED ? $validated['rejected_reason'] : null;
             $verification->save();
 
+            $user = $verification->load('user');
+            $user->verified_at = now();
+            $user->save();
+
             return response()->json([
                 'message' => 'Success',
                 'data' => $verification->fresh(),

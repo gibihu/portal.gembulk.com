@@ -366,50 +366,52 @@ export default function OtpTemplatePage(request: any) {
                                         </FormItem> */}
 
                                         {/* Senders Toggle */}
-                                        <FormItem>
-                                            <FormLabel>ผู้ส่ง</FormLabel>
-                                            <div className="space-y-2">
-                                                {senders.length === 0 ? (
-                                                    <p className="text-sm text-gray-500">ไม่พบผู้ส่ง</p>
-                                                ) : (
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {senders.map((sender) => {
-                                                            const currentSenders = apiKeyForm.watch("permissions.senders") ?? [];
-                                                            const isSelected = currentSenders.includes(sender.id);
-                                                            if (sender.status_text == "active") {
-                                                                return (
-                                                                    <Button
-                                                                        key={sender.id}
-                                                                        type="button"
-                                                                        variant={isSelected ? "default" : "outline"}
-                                                                        size="sm"
-                                                                        className="border"
-                                                                        onClick={() => {
-                                                                            const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
-                                                                            if (isSelected) {
-                                                                                // Remove sender
-                                                                                apiKeyForm.setValue(
-                                                                                    "permissions.senders",
-                                                                                    sendersList.filter((id: string) => id !== sender.id)
-                                                                                );
-                                                                            } else {
-                                                                                // Add sender
-                                                                                apiKeyForm.setValue(
-                                                                                    "permissions.senders",
-                                                                                    [...sendersList, sender.id]
-                                                                                );
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {sender.name}
-                                                                    </Button>
-                                                                );
-                                                            }
-                                                        })}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </FormItem>
+                                        {apiKeyForm.watch("options.sms") && (
+                                            <FormItem>
+                                                <FormLabel>ผู้ส่ง</FormLabel>
+                                                <div className="space-y-2">
+                                                    {senders.length === 0 ? (
+                                                        <p className="text-sm text-gray-500">ไม่พบผู้ส่ง</p>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {senders.map((sender) => {
+                                                                const currentSenders = apiKeyForm.watch("permissions.senders") ?? [];
+                                                                const isSelected = currentSenders.includes(sender.id);
+                                                                if (sender.status_text == "active") {
+                                                                    return (
+                                                                        <Button
+                                                                            key={sender.id}
+                                                                            type="button"
+                                                                            variant={isSelected ? "default" : "outline"}
+                                                                            size="sm"
+                                                                            className="border"
+                                                                            onClick={() => {
+                                                                                const sendersList = apiKeyForm.watch("permissions.senders") ?? [];
+                                                                                if (isSelected) {
+                                                                                    // Remove sender
+                                                                                    apiKeyForm.setValue(
+                                                                                        "permissions.senders",
+                                                                                        sendersList.filter((id: string) => id !== sender.id)
+                                                                                    );
+                                                                                } else {
+                                                                                    // Add sender
+                                                                                    apiKeyForm.setValue(
+                                                                                        "permissions.senders",
+                                                                                        [...sendersList, sender.id]
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {sender.name}
+                                                                        </Button>
+                                                                    );
+                                                                }
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </FormItem>
+                                        )}
 
                                         {/* Submit Button */}
                                         <div className="flex justify-end gap-2">
