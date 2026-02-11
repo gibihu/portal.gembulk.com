@@ -12,3 +12,5 @@ Schedule::command('app:send-sms-report')->everyFiveMinutes()->withoutOverlapping
 
 Schedule::command('app:send-otp')->everyFiveSeconds()->withoutOverlapping();
 Schedule::command('app:send-otp-report')->everyMinute()->withoutOverlapping();
+
+Schedule::command('app:payment-hook')->everySecond()->withoutOverlapping();

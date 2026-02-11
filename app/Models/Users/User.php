@@ -26,6 +26,7 @@ class User extends Authenticatable
         'plan_id',
         'roles',
         'avatar',
+        'verified_at',
         'status',
     ];
 
