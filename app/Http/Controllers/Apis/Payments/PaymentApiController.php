@@ -44,7 +44,7 @@ class PaymentApiController extends Controller
             $provider = Provider::where('code', 'p2wpay')->firstOrFail();
 
             // ===== Transaction =====
-            $tax_rate = $plan->price + ($plan->price * ($plan->tax_rate ?? 1));
+            $tax_rate = $plan->price + ($plan->price * ($plan->tax_rate ?? 0));
             $trans = Transaction::firstOrCreate(
                 ['id' => $request->transaction_id],
                 [
