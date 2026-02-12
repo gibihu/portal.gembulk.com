@@ -25,7 +25,6 @@ class PaymentApiController extends Controller
 
             $request->validate([
                 'plan_id' => 'required',
-                'fee' => 'required',
                 'payment_method' => 'required',
             ]);
 
@@ -45,6 +44,7 @@ class PaymentApiController extends Controller
             $provider = Provider::where('code', 'p2wpay')->firstOrFail();
 
             // ===== Transaction =====
+            $tax_rate = $plan->price + ($plan->price * ($plan->tax_rate ?? 1));
             $trans = Transaction::firstOrCreate(
                 ['id' => $request->transaction_id],
                 [
@@ -52,10 +52,10 @@ class PaymentApiController extends Controller
                     'provider_id' => $provider->id,
                     'provider_name' => $provider->name,
                     'plan_id' => $plan->id,
-                    'amount' => $plan->price,
+                    'amount' => $tax_rate,
                     'payment_method' => $request->payment_method,
                     'type' => 'deposit',
-                    'fee' => $request->fee,
+                    'fee' => $plan->fee_rate ?? 0,
                     'status' => Transaction::STATUS_PROCESSING,
                 ]
             );
