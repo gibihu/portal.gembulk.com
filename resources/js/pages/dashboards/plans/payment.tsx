@@ -43,10 +43,10 @@ export default function PlanPaymentPage(request: any) {
     const bill = {
         main: plan,
         plan_id: plan ? plan.id : '',
-        tax: plan ? plan.price * plan.tax_rate : 0,
-        fee: 20,
+        tax: plan ? plan.price * 0.07 : 0,
+        fee: 0,
         tax_invoice: false,
-        total: plan ? plan.price + (plan.price * plan.tax_rate) + 20 : 0,
+        total: plan ? plan.price + (plan.price * 0.07) : 0,
         currency: plan ? plan.currency : 'THB',
     };
 
@@ -65,7 +65,7 @@ export default function PlanPaymentPage(request: any) {
                     body: JSON.stringify({
                         transaction_id: transaction.id,
                         plan_id: bill.plan_id,
-                        fee: bill.fee,
+                        tax_invoice: bill.tax_invoice,
                         payment_method: paymentMethod,
                     }),
                 });
